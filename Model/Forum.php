@@ -1,79 +1,70 @@
 <?php
-require_once '../config.php'; // Make sure your config connection is loaded
+require_once __DIR__ . '/../config.php';
 
-class Forum
-{
-    private $sujet;
-    private $contenu;
-    private $date_publication;
+class Forum {
+    private $pdo;
 
-    public function __construct($sujet, $contenu, $date_publication)
-    {
-        $this->sujet = $sujet;
-        $this->contenu = $contenu;
-        $this->date_publication = $date_publication;
+    public function __construct() {
+        $this->pdo = config::getConnexion();
     }
 
-    // ---------- GETTERS ----------
-    public function getSujet() {
-        return $this->sujet;
-    }
-
-    public function getContenu() {
-        return $this->contenu;
-    }
-
-    public function getDatePublication() {
-        return $this->date_publication;
-    }
-
-    // ---------- STATIC CRUD METHODS ----------
-
-    public static function addForum($forum)
-    {
-        $db = config::getConnexion();
-        $sql = "INSERT INTO forum (sujet, contenu, date_publication) 
-                VALUES (:sujet, :contenu, :date_publication)";
+    public function getAllForums() {
         try {
-            $query = $db->prepare($sql);
-            $query->execute([
-                'sujet' => $forum['Sujet'],
-                'contenu' => $forum['Contenu'],
-                'date_publication' => $forum['Date_publication']
-            ]);
+            $stmt = $this->pdo->query('SELECT * FROM forum ORDER BY date_publication DESC');
+            if (!$stmt) {
+                error_log('Error in getAllForums: ' . implode(', ', $this->pdo->errorInfo()));
+                return false;
+            }
+            return $stmt->fetchAll();
         } catch (Exception $e) {
-            die('Erreur ajout forum: ' . $e->getMessage());
+            error_log('Exception in getAllForums: ' . $e->getMessage());
+            return false;
         }
     }
 
-    public static function deleteForum($id)
-    {
-        $db = config::getConnexion();
-        $sql = "DELETE FROM forum WHERE id = ?";
+    public function getForumById($id) {
         try {
-            $query = $db->prepare($sql);
-            $query->execute([$id]);
+            if (!$id) {
+                return false;
+            }
+            $stmt = $this->pdo->prepare('SELECT * FROM forum WHERE id_forum = ?');
+            if (!$stmt->execute([$id])) {
+                error_log('Error in getForumById: ' . implode(', ', $stmt->errorInfo()));
+                return false;
+            }
+            return $stmt->fetch();
         } catch (Exception $e) {
-            die('Erreur suppression forum: ' . $e->getMessage());
+            error_log('Exception in getForumById: ' . $e->getMessage());
+            return false;
         }
     }
 
-    public static function getForumById($id)
-    {
-        $db = config::getConnexion();
-        $query = $db->prepare("SELECT * FROM forum WHERE id = ?");
-        $query->execute([$id]);
-        return $query->fetch();
+    public function addForum($sujet, $contenu) {
+        try {
+            error_log('Attempting to add forum with subject: ' . $sujet);
+            $stmt = $this->pdo->prepare('INSERT INTO forum (sujet, contenu, date_publication) VALUES (?, ?, NOW())');
+            $result = $stmt->execute([$sujet, $contenu]);
+            if (!$result) {
+                $error = implode(', ', $stmt->errorInfo());
+                error_log('Failed to insert forum: ' . $error);
+                throw new Exception('Database error: ' . $error);
+            }
+            error_log('Successfully added forum with ID: ' . $this->pdo->lastInsertId());
+            return true;
+        } catch (Exception $e) {
+            error_log('Error in addForum: ' . $e->getMessage());
+            error_log('Stack trace: ' . $e->getTraceAsString());
+            return false;
+        }
     }
 
-    public static function updateForum($id, $sujet, $contenu, $date_publication)
-    {
-        $db = config::getConnexion();
-        $query = $db->prepare("UPDATE forum SET sujet = ?, contenu = ?, date_publication = ? WHERE id = ?");
-        $query->execute([$sujet, $contenu, $date_publication, $id]);
+    public function updateForum($id, $sujet, $contenu) {
+        $stmt = $this->pdo->prepare('UPDATE forum SET sujet = ?, contenu = ? WHERE id_forum = ?');
+        return $stmt->execute([$sujet, $contenu, $id]);
     }
 
-    public static function getAllForums()
-    {
-        $db = config::getConnexion();
-        $query = $db->query("SELECT * FROM forum ORDER BY date_publication_*
+    public function deleteForum($id) {
+        $stmt = $this->pdo->prepare('DELETE FROM forum WHERE id_forum = ?');
+        return $stmt->execute([$id]);
+    }
+}
