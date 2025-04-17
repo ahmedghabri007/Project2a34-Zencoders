@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soumission de Document</title>
+    <link rel="stylesheet" href="form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1><i class="fas fa-id-card"></i> Vérification de Document</h1>
+        
+        <form class="document-form" id="documentForm" method="POST" action="../Back_Office/add_verification.php">
+            <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> Type de Document</label>
+                <select name="document_type">
+                    <option value="">Sélectionner...</option>
+                    <option value="CNI">Carte Nationale d'Identité</option>
+                    <option value="PASSEPORT">Passeport</option>
+                    <option value="PERMIS">Permis de Conduire</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-hashtag"></i> Numéro du Document</label>
+                <input type="text" 
+                       name="document_number" 
+                       pattern="[A-Z0-9]{8,12}"
+                       placeholder="Ex: AB12345678">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-check"></i> verify
+            </button>
+        </form>
+    </div>
+</body>
+<script src="verification.js"></script>
+</html>
