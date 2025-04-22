@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Authentication</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="container" class="container">
+    <div class="row">
+      <!-- SIGN UP -->
+      <div class="col align-items-center flex-col sign-up">
+        <div class="form-wrapper align-items-center">
+          <div class="form sign-up">
+            <form id="signupForm" method="POST">
+              <div class="input-group">
+                <i class="bx bxs-user"></i>
+                <input type="text" name="fullName" placeholder="Full Name" required />
+              </div>
+              <div class="input-group">
+                <i class="bx bx-mail-send"></i>
+                <input type="email" name="email" placeholder="Email" required />
+              </div>
+              <div class="input-group">
+                <i class="bx bxs-phone"></i>
+                <input type="tel" name="phone" placeholder="Phone Number" required />
+              </div>
+              <div class="input-group">
+                <i class="bx bx-calendar"></i>
+                <input type="number" name="age" placeholder="Age" required min="18" max="120" />
+              </div>
+              <div class="select-group">
+                <div class="input-group">
+                  <i class="bx bx-user-circle"></i>
+                  <select name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <i class="bx bx-heart"></i>
+                  <select name="lifeStatus" required>
+                    <option value="">Life Status</option>
+                    <option value="single">Single</option>
+                    <option value="married">Married</option>
+                    <option value="divorced">Divorced</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <i class="bx bx-user-pin"></i>
+                  <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="user">User</option>
+                    <option value="organizer">Organizer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="input-group">
+                <i class="bx bxs-lock-alt"></i>
+                <input type="password" id="password" name="password" placeholder="Password" required />
+                <i class="bx bx-hide toggle-password" onclick="togglePassword('password', this)"></i>
+              </div>
+              <div class="input-group">
+                <i class="bx bxs-lock-alt"></i>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required />
+                <i class="bx bx-hide toggle-password" onclick="togglePassword('confirm_password', this)"></i>
+              </div>
+              <button type="submit" name="sign_up">Create Account</button>
+            </form>
+            <p>
+              <span>Already have an account?</span>
+              <b onclick="toggle()" class="pointer">Sign in here</b>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIGN IN -->
+      <div class="col align-items-center flex-col sign-in">
+        <div class="form-wrapper align-items-center">
+          <div class="form sign-in">
+            <form id="signinForm" method="POST">
+              <div class="input-group">
+                <i class="bx bx-mail-send"></i>
+                <input type="email" name="email" placeholder="Email" required />
+              </div>
+              <div class="input-group">
+                <i class="bx bxs-lock-alt"></i>
+                <input type="password" id="signin_password" name="password" placeholder="Password" required />
+                <i class="bx bx-hide toggle-password" onclick="togglePassword('signin_password', this)"></i>
+              </div>
+              <button type="submit" name="sign_in">Sign in</button>
+            </form>
+            <p><a href="forgotpassword.html" class="forgot-password">Forgot password?</a></p>
+            <p>
+              <span>Don't have an account?</span>
+              <b onclick="toggle()" class="pointer">Sign up here</b>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT SECTION -->
+    <div class="row content-row">
+      <div class="col align-items-center flex-col">
+        <div class="text sign-in">
+          <h2>Welcome Back!</h2>
+          <p>We're glad to see you again</p>
+        </div>
+        <div class="img sign-in">
+          <img src="https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg" alt="Welcome" />
+        </div>
+      </div>
+      <div class="col align-items-center flex-col">
+        <div class="img sign-up">
+          <img src="https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg" alt="Join us" />
+        </div>
+        <div class="text sign-up">
+          <h2>Join with Us</h2>
+          <p>Create an account and start your journey</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
