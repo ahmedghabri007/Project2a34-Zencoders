@@ -1,111 +1,62 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 include '../../config/config.php';
 
-$pdo = config::getConnexion();
+$error = '';
+$success = '';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $requiredFields = ['fullname', 'age', 'gender', 'location', 'profession', 'interests', 'biography'];
-
-    foreach ($requiredFields as $field) {
-        if (empty($_POST[$field])) {
-            echo "⚠️ The field '$field' is required.";
-            exit();
-        }
-    }
-
-    $fullname = $_POST['fullname'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $fullname = trim($_POST['fullname']);
     $age = intval($_POST['age']);
     $gender = $_POST['gender'];
-    $location = $_POST['location'];
-    $interests = $_POST['interests'];
-    $biography = $_POST['biography'];
-    $profession = $_POST['profession'];
+    $location = trim($_POST['location']);
+    $profession = trim($_POST['profession']);
+    $interests = trim($_POST['interests']);
+    $biography = trim($_POST['biography']);
+    $phone = trim($_POST['phone']); // Get the phone number
 
-    if ($age < 18) {
-        echo "❌ Age must be greater than 18.";
-        exit();
-    }
+    if (empty($fullname) || empty($age) || empty($gender) || empty($location) || empty($profession) || empty($interests) || empty($biography) || empty($phone)) {
+        $error = "Tous les champs sont obligatoires.";
+    } elseif ($age < 18) {
+        $error = "L'âge doit être au moins 18 ans.";
+    } elseif (strlen($biography) < 20) {
+        $error = "La biographie doit contenir au moins 20 caractères.";
+    } elseif (!preg_match('/^\d{8}$/', $phone)) { // Validate phone number for 8 digits
+        $error = "Le numéro de téléphone doit être valide (8 chiffres).";
+    } else {
+        try {
+            $pdo = Config::getConnexion();
 
-    try {
-        $sql = "INSERT INTO profile (fullname, age, gender, location, profession, interests, biography)
-                VALUES (:fullname, :age, :gender, :location, :profession, :interests, :biography)";
+            // Add phone column to the INSERT query
+            $stmt = $pdo->prepare("INSERT INTO profile (fullname, age, gender, location, profession, interests, biography, phone)
+                                   VALUES (:fullname, :age, :gender, :location, :profession, :interests, :biography, :phone)");
 
-        $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':fullname' => $fullname,
+                ':age' => $age,
+                ':gender' => $gender,
+                ':location' => $location,
+                ':profession' => $profession,
+                ':interests' => $interests,
+                ':biography' => $biography,
+                ':phone' => $phone  // Include phone in the insert statement
+            ]);
 
-        $stmt->execute([
-            ':fullname' => $fullname,
-            ':age' => $age,
-            ':gender' => $gender,
-            ':location' => $location,
-            ':profession' => $profession,
-            ':interests' => $interests,
-            ':biography' => $biography
-        ]);
+            if ($stmt->rowCount()) {
+                header("Location: ../Front_Office/formulaire.html?success=1");
+                exit();
+            } else {
+                $error = "Une erreur s'est produite lors de l'ajout du profil.";
+            }
 
-        echo "✅ Profile added successfully.<br><br>";
-    } catch (PDOException $e) {
-        echo "❌ Error: " . $e->getMessage();
-        exit();
+        } catch (PDOException $e) {
+            $error = "Erreur base de données : " . $e->getMessage();
+        }
     }
 }
 
-// At this point, whether GET or POST, we display the profile list:
-
-try {
-    $stmt = $pdo->prepare("SELECT * FROM profile");
-    $stmt->execute();
-    $profiles = $stmt->fetchAll();
-} catch (PDOException $e) {
-    die("❌ Error fetching profiles: " . $e->getMessage());
+if (!empty($error)) {
+    echo "<div style='color: red; text-align: center;'>❌ $error</div>";
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Back Office - Profile List</title>
-    <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Profile List</h2>
-
-        <?php if (!empty($profiles)): ?>
-            <table border="1" cellpadding="10">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Age</th>
-                        <th>Gender</th>
-                        <th>Location</th>
-                        <th>Profession</th>
-                        <th>Interests</th>
-                        <th>Biography</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($profiles as $profile): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($profile['idprofile']) ?></td>
-                            <td><?= htmlspecialchars($profile['fullname']) ?></td>
-                            <td><?= htmlspecialchars($profile['age']) ?></td>
-                            <td><?= htmlspecialchars($profile['gender']) ?></td>
-                            <td><?= htmlspecialchars($profile['location']) ?></td>
-                            <td><?= htmlspecialchars($profile['profession']) ?></td>
-                            <td><?= htmlspecialchars($profile['interests']) ?></td>
-                            <td><?= htmlspecialchars($profile['biography']) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>No profiles found.</p>
-        <?php endif; ?>
-    </div>
-</body>
-</html>

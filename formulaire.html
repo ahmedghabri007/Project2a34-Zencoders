@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajout de Profil</title>
+    <link rel="stylesheet" href="formulaire.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1><i class="fas fa-user-plus"></i> Create Profil</h1>
+        <form class="document-form" id="profileForm" method="POST" action="../Back_Office/addprofile.php">            
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" name="fullname" placeholder="Full Name" >
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-hourglass-half"></i> Age</label>
+                <input type="number" name="age" min="18" placeholder="+18" >
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-venus-mars"></i> Gender</label>
+                <select name="gender">
+                    <option value="">Choose...</option>
+                    <option value="male">Masculin</option>
+                    <option value="female">Feminine</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                <input type="text" name="location" placeholder="City / Country" >
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-briefcase"></i> Profession</label>
+                <input type="text" name="profession" placeholder="Profession">
+            </div>
+
+            <!-- ✅ PHONE FIELD ADDED HERE -->
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="text" name="phone" placeholder="Ex: +21612345678">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-heart"></i> Interests</label>
+                <input type="text" name="interests" placeholder="Ex: Musique, Sport...">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Biography</label>
+                <textarea name="biography" rows="4" placeholder="Describe yourself..."></textarea>
+            </div>
+
+            <div id="form-errors" style="margin-bottom: 10px; color: red;"></div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-check"></i> Add profil
+            </button>
+        </form>
+    </div>
+
+    <script src="formulaire.js"></script>
+</body>
+</html>
