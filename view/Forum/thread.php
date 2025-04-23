@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../view/FrontOffice/header.php';
                 <form action="/project-2a34/index.php?action=addComment" method="POST" class="mb-4">
                     <input type="hidden" name="thread" value="<?php echo $thread['id_forum']; ?>">
                     <div class="form-group">
-                        <textarea class="form-control" name="comment" rows="3" placeholder="Write your comment here..." required></textarea>
+                        <textarea class="form-control" name="comment" rows="3" placeholder="Write your comment here..." ></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Add Comment</button>
                 </form>

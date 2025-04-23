@@ -17,9 +17,7 @@ defined('FORUM_VIEW') or die('Direct access not permitted');
                 <div class="mb-3">
                     <textarea class="form-control" id="comment" name="comment" 
                         rows="3" 
-                        required 
-                        minlength="2"
-                        maxlength="1000"
+
                         placeholder="Write your comment here..."></textarea>
                     <div class="invalid-feedback" id="commentError"></div>
                 </div>
@@ -53,8 +51,35 @@ defined('FORUM_VIEW') or die('Direct access not permitted');
                             </div>
                             <!-- Comment content -->
                             <div class="flex-grow-1">
-                                <p class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></p>
-                                <small class="text-muted">Score: <?= ($post['upvote'] ?? 0) - ($post['downvote'] ?? 0) ?></small>
+                                <!-- Normal view mode -->
+                                <div id="comment-view-<?= $post['id_post'] ?>">
+                                    <p class="mb-1"><?= nl2br(htmlspecialchars($post['comment'])) ?></p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Score: <?= ($post['upvote'] ?? 0) - ($post['downvote'] ?? 0) ?></small>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="showEditForm(<?= $post['id_post'] ?>)">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                            <a href="/project-2a34/index.php?action=deleteComment&id=<?= $post['id_post'] ?>&thread=<?= $forum['id_forum'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this comment?')">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Edit form (hidden by default) -->
+                                <div id="comment-edit-<?= $post['id_post'] ?>" style="display: none;">
+                                    <form method="post" action="/project-2a34/index.php?action=editComment&id=<?= $post['id_post'] ?>&thread=<?= $forum['id_forum'] ?>" onsubmit="return validateEditForm(<?= $post['id_post'] ?>)">
+                                        <div class="mb-3">
+                                            <textarea class="form-control" id="edit-comment-<?= $post['id_post'] ?>" name="comment" rows="3"><?= htmlspecialchars($post['comment']) ?></textarea>
+                                            <div class="invalid-feedback" id="edit-comment-error-<?= $post['id_post'] ?>"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-sm btn-secondary me-2" onclick="hideEditForm(<?= $post['id_post'] ?>)">Cancel</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -64,47 +89,62 @@ defined('FORUM_VIEW') or die('Direct access not permitted');
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../../view/FrontOffice/footer.php'; ?>
-</div>
+<!-- End of Comments Section -->
 
 <script>
 function validateCommentForm() {
-    let isValid = true;
-    const comment = document.getElementById('comment');
-    const commentError = document.getElementById('commentError');
+    var isValid = true;
+    var comment = document.getElementById('comment');
+    var commentError = document.getElementById('commentError');
 
     // Reset previous errors
-    comment.classList.remove('is-invalid');
+    comment.className = comment.className.replace(" is-invalid", "");
 
     // Validate comment
     if (comment.value.length < 2) {
-        comment.classList.add('is-invalid');
-        commentError.textContent = 'Comment must be at least 2 characters long';
+        comment.className += " is-invalid";
+        commentError.innerHTML = 'Comment must be at least 2 characters long';
         isValid = false;
     } else if (comment.value.length > 1000) {
-        comment.classList.add('is-invalid');
-        commentError.textContent = 'Comment must not exceed 1000 characters';
+        comment.className += " is-invalid";
+        commentError.innerHTML = 'Comment must not exceed 1000 characters';
         isValid = false;
     }
 
     return isValid;
 }
 
-function votePost(postId, voteType) {
-    fetch(`/project-2a34/index.php?action=vote&id=${postId}&type=${voteType}`, {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Failed to vote. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while voting.');
-    });
+function validateEditForm(commentId) {
+    var isValid = true;
+    var comment = document.getElementById('edit-comment-' + commentId);
+    var commentError = document.getElementById('edit-comment-error-' + commentId);
+
+    // Reset previous errors
+    comment.className = comment.className.replace(" is-invalid", "");
+
+    // Validate comment
+    if (comment.value.length < 2) {
+        comment.className += " is-invalid";
+        commentError.innerHTML = 'Comment must be at least 2 characters long';
+        isValid = false;
+    } else if (comment.value.length > 1000) {
+        comment.className += " is-invalid";
+        commentError.innerHTML = 'Comment must not exceed 1000 characters';
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function showEditForm(commentId) {
+    // Hide the view div and show the edit form
+    document.getElementById('comment-view-' + commentId).style.display = 'none';
+    document.getElementById('comment-edit-' + commentId).style.display = 'block';
+}
+
+function hideEditForm(commentId) {
+    // Hide the edit form and show the view div
+    document.getElementById('comment-edit-' + commentId).style.display = 'none';
+    document.getElementById('comment-view-' + commentId).style.display = 'block';
 }
 </script>

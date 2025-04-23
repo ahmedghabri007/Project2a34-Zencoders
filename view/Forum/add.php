@@ -9,10 +9,7 @@
         <div class="mb-3">
             <label for="sujet" class="form-label">Subject</label>
             <input type="text" class="form-control" id="sujet" name="sujet" 
-                required 
-                minlength="5" 
-                maxlength="255" 
-                pattern="[A-Za-z0-9\s\-_.,!?()]+"
+
                 title="Subject must be between 5 and 255 characters and can only contain letters, numbers, spaces, and basic punctuation">
             <div class="invalid-feedback" id="sujetError"></div>
         </div>
@@ -20,9 +17,7 @@
             <label for="contenu" class="form-label">Content</label>
             <textarea class="form-control" id="contenu" name="contenu" 
                 rows="5" 
-                required 
-                minlength="10"
-                maxlength="1000"></textarea>
+></textarea>
             <div class="invalid-feedback" id="contenuError"></div>
         </div>
         <button type="submit" class="btn btn-primary">Create Forum</button>

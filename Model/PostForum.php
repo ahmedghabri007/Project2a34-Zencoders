@@ -10,7 +10,9 @@ class PostForum {
 
     public function getPostsByThread($threadId) {
         try {
-            $stmt = $this->pdo->prepare('SELECT * FROM post_forum WHERE thread = ? ORDER BY id_post DESC');
+            $stmt = $this->pdo->prepare('SELECT p.*, f.sujet as thread_title FROM post_forum p 
+                                       LEFT JOIN forum f ON p.thread = f.id_forum 
+                                       WHERE p.thread = ? ORDER BY p.id_post DESC');
             $stmt->execute([$threadId]);
             return $stmt->fetchAll();
         } catch (Exception $e) {
@@ -25,7 +27,8 @@ class PostForum {
                 throw new Exception('Comment must be between 2 and 1000 characters');
             }
 
-            $stmt = $this->pdo->prepare('INSERT INTO post_forum (comment, thread, upvote, downvote) VALUES (?, ?, 0, 0)');
+            $stmt = $this->pdo->prepare('INSERT INTO post_forum (comment, thread, upvote, downvote, status, date_publication) 
+                                       VALUES (?, ?, 0, 0, "active", NOW())');
             $result = $stmt->execute([trim($comment), $threadId]);
             
             if (!$result) {
@@ -92,6 +95,81 @@ class PostForum {
             return true;
         } catch (Exception $e) {
             error_log('Error in deletePost: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getPostById($id) {
+        try {
+            $stmt = $this->pdo->prepare('SELECT * FROM post_forum WHERE id_post = ?');
+            $stmt->execute([$id]);
+            return $stmt->fetch();
+        } catch (Exception $e) {
+            error_log('Error in getPostById: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function updateStatus($id, $status) {
+        try {
+            if (empty($id)) {
+                throw new Exception('Invalid comment ID');
+            }
+
+            if (!in_array($status, ['active', 'inactive'])) {
+                throw new Exception('Invalid status value: ' . $status);
+            }
+
+            // Check if comment exists
+            $comment = $this->getPostById($id);
+            if (!$comment) {
+                throw new Exception('Comment not found with ID: ' . $id);
+            }
+
+            // Update the status
+            $stmt = $this->pdo->prepare('UPDATE post_forum SET status = ? WHERE id_post = ?');
+            $result = $stmt->execute([$status, $id]);
+
+            if (!$result) {
+                $error = $stmt->errorInfo();
+                throw new Exception('Failed to update comment status: ' . ($error[2] ?? 'Unknown error'));
+            }
+
+            return true;
+        } catch (Exception $e) {
+            error_log('Error in updateStatus: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    public function updateComment($id, $comment) {
+        try {
+            if (empty($id)) {
+                throw new Exception('Invalid comment ID');
+            }
+            
+            if (empty($comment) || strlen($comment) < 2 || strlen($comment) > 1000) {
+                throw new Exception('Comment must be between 2 and 1000 characters');
+            }
+            
+            // Check if comment exists
+            $existingComment = $this->getPostById($id);
+            if (!$existingComment) {
+                throw new Exception('Comment not found with ID: ' . $id);
+            }
+            
+            // Update the comment
+            $stmt = $this->pdo->prepare('UPDATE post_forum SET comment = ? WHERE id_post = ?');
+            $result = $stmt->execute([trim($comment), $id]);
+            
+            if (!$result) {
+                $error = $stmt->errorInfo();
+                throw new Exception('Failed to update comment: ' . ($error[2] ?? 'Unknown error'));
+            }
+            
+            return true;
+        } catch (Exception $e) {
+            error_log('Error in updateComment: ' . $e->getMessage());
             return false;
         }
     }

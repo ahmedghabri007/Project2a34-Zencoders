@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../view/FrontOffice/header.php'; ?>
+<?php require_once __DIR__ . '/header.php'; ?>
 
 <!-- Page Header Start -->
 <div class="container-fluid bg-primary py-5 mb-5">
@@ -65,9 +65,14 @@
                                 <p class="text-muted mb-4"><?= htmlspecialchars(substr($forum['contenu'], 0, 150)) ?>...</p>
                                 <div class="d-flex justify-content-between">
                                     <a href="/project-2a34/index.php?action=view&id=<?= htmlspecialchars($forum['id_forum']) ?>" class="btn btn-primary py-2 px-4">View Discussion</a>
-                                    <a href="/project-2a34/index.php?action=delete&id=<?= htmlspecialchars($forum['id_forum']) ?>" class="btn btn-outline-danger py-2 px-4" onclick="return confirm('Are you sure you want to delete this thread?')">
-                                        <i class="bi bi-trash"></i> Delete
-                                    </a>
+                                    <div>
+                                        <a href="/project-2a34/index.php?action=edit&id=<?= htmlspecialchars($forum['id_forum']) ?>" class="btn btn-outline-primary py-2 px-4 me-2">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a href="/project-2a34/index.php?action=delete&id=<?= htmlspecialchars($forum['id_forum']) ?>" class="btn btn-outline-danger py-2 px-4" onclick="return confirm('Are you sure you want to delete this thread?')">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -79,4 +84,4 @@
 </div>
 <!-- Forum List End -->
 
-<?php require_once __DIR__ . '/../../view/FrontOffice/footer.php'; ?>
+<?php require_once __DIR__ . '/footer.php'; ?>

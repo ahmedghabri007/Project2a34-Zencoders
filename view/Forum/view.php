@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../view/FrontOffice/header.php'; ?>
+<?php require_once __DIR__ . '/header.php'; ?>
 
 <div class="container mt-4">
     <?php if (isset($_SESSION['error'])): ?>
@@ -38,4 +38,4 @@
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../../view/FrontOffice/footer.php'; ?>
+<?php require_once __DIR__ . '/footer.php'; ?>

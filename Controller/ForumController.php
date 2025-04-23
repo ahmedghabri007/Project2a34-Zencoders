@@ -50,7 +50,7 @@ switch ($action) {
                 $result = $forumModel->addForum($sujet, $contenu);
                 if ($result) {
                     $_SESSION['success'] = 'Thread created successfully!';
-                    header('Location: /project-2a34/index.php');
+                    header('Location: /project-2a34/index.php?action=list');
                     exit();
                 } else {
                     $error = 'Failed to create thread. Please try again.';
@@ -63,6 +63,12 @@ switch ($action) {
         break;
 
     case 'edit':
+        if (!isset($_GET['id'])) {
+            $_SESSION['error'] = 'Forum ID is required';
+            header('Location: /project-2a34/index.php?action=list');
+            exit();
+        }
+        
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sujet = trim($_POST['sujet'] ?? '');
@@ -95,7 +101,8 @@ switch ($action) {
             } else {
                 $result = $forumModel->updateForum($id, $sujet, $contenu);
                 if ($result) {
-                    header('Location: /project-2a34/index.php');
+                    $_SESSION['success'] = 'Forum updated successfully!';
+                    header('Location: /project-2a34/index.php?action=list');
                     exit();
                 } else {
                     $error = 'Failed to update forum. Please try again.';
@@ -106,7 +113,8 @@ switch ($action) {
         } else {
             $forum = $forumModel->getForumById($id);
             if (!$forum) {
-                header('Location: /project-2a34/index.php');
+                $_SESSION['error'] = 'Forum not found';
+                header('Location: /project-2a34/index.php?action=list');
                 exit();
             }
             include __DIR__ . '/../view/Forum/edit.php';
@@ -114,8 +122,23 @@ switch ($action) {
         break;
 
     case 'delete':
-        $forumModel->deleteForum($_GET['id']);
-        header('Location: /project-2a34/index.php');
+        if (!isset($_GET['id'])) {
+            $_SESSION['error'] = 'Forum ID is required';
+            header('Location: /project-2a34/index.php?action=list');
+            exit();
+        }
+        
+        $id = $_GET['id'];
+        $result = $forumModel->deleteForum($id);
+        
+        if ($result) {
+            $_SESSION['success'] = 'Forum deleted successfully!';
+        } else {
+            $_SESSION['error'] = 'Failed to delete forum. Please try again.';
+        }
+        
+        header('Location: /project-2a34/index.php?action=list');
+        exit();
         break;
 
     case 'view':
@@ -143,6 +166,80 @@ switch ($action) {
         include __DIR__ . '/../view/Forum/view.php';
         break;
 
+    case 'editComment':
+        if (!isset($_GET['id']) || !isset($_GET['thread'])) {
+            $_SESSION['error'] = 'Comment ID and Thread ID are required';
+            header('Location: /project-2a34/index.php?action=list');
+            exit();
+        }
+        
+        $commentId = $_GET['id'];
+        $threadId = $_GET['thread'];
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $commentText = trim($_POST['comment'] ?? '');
+            $error = '';
+            
+            // Validate comment
+            if (empty($commentText)) {
+                $error = 'Comment is required';
+            } elseif (strlen($commentText) < 2) {
+                $error = 'Comment must be at least 2 characters long';
+            } elseif (strlen($commentText) > 1000) {
+                $error = 'Comment must not exceed 1000 characters';
+            }
+            
+            if ($error) {
+                $comment = $postModel->getPostById($commentId);
+                $forum = $forumModel->getForumById($threadId);
+                include __DIR__ . '/../view/Forum/edit_comment.php';
+            } else {
+                $result = $postModel->updateComment($commentId, $commentText);
+                if ($result) {
+                    $_SESSION['success'] = 'Comment updated successfully!';
+                    header('Location: /project-2a34/index.php?action=view&id=' . $threadId);
+                    exit();
+                } else {
+                    $error = 'Failed to update comment. Please try again.';
+                    $comment = $postModel->getPostById($commentId);
+                    $forum = $forumModel->getForumById($threadId);
+                    include __DIR__ . '/../view/Forum/edit_comment.php';
+                }
+            }
+        } else {
+            $comment = $postModel->getPostById($commentId);
+            if (!$comment) {
+                $_SESSION['error'] = 'Comment not found';
+                header('Location: /project-2a34/index.php?action=view&id=' . $threadId);
+                exit();
+            }
+            $forum = $forumModel->getForumById($threadId);
+            include __DIR__ . '/../view/Forum/edit_comment.php';
+        }
+        break;
+        
+    case 'deleteComment':
+        if (!isset($_GET['id']) || !isset($_GET['thread'])) {
+            $_SESSION['error'] = 'Comment ID and Thread ID are required';
+            header('Location: /project-2a34/index.php?action=list');
+            exit();
+        }
+        
+        $commentId = $_GET['id'];
+        $threadId = $_GET['thread'];
+        
+        $result = $postModel->deletePost($commentId);
+        
+        if ($result) {
+            $_SESSION['success'] = 'Comment deleted successfully!';
+        } else {
+            $_SESSION['error'] = 'Failed to delete comment. Please try again.';
+        }
+        
+        header('Location: /project-2a34/index.php?action=view&id=' . $threadId);
+        exit();
+        break;
+        
     case 'vote':
         if (!isset($_GET['id']) || !isset($_GET['type']) || !isset($_GET['thread'])) {
             header('Location: /project-2a34/index.php');
