@@ -21,21 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Événements de validation
+    // Validation des champs lorsque l'utilisateur interagit avec les inputs
     docTypeSelect.addEventListener('change', () => validateField('document_type'));
     docNumberInput.addEventListener('input', debounce(() => validateField('document_number'), 300));
     
+    // Soumission du formulaire
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
+        e.preventDefault();  // Empêcher la soumission par défaut du formulaire
+
         const isFormValid = Object.keys(validationRules).every(field => validateField(field));
         
-        if(isFormValid) {
+        if (isFormValid) {
             handleFormSubmission();
-            this.reset();
-            clearAllErrors();
+            this.submit();  // Si tout est valide, soumettre le formulaire
         }
     });
 
+    // Fonction de validation des champs
     function validateField(field) {
         const value = form.elements[field].value.trim();
         const { validate, message } = validationRules[field];
@@ -51,16 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
+    // Afficher un message d'erreur
     function showError(field, message) {
         errorMessages[field].textContent = message;
         form.elements[field].classList.add('invalid');
     }
 
+    // Effacer un message d'erreur
     function clearError(field) {
         errorMessages[field].textContent = '';
         form.elements[field].classList.remove('invalid');
     }
 
+    // Effacer tous les messages d'erreur
     function clearAllErrors() {
         Object.keys(errorMessages).forEach(field => {
             errorMessages[field].textContent = '';
@@ -68,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Créer un conteneur d'erreur
     function createErrorContainer(parent) {
         const errorDiv = document.createElement('div');
         errorDiv.className = 'error-message';
@@ -75,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return errorDiv;
     }
 
+    // Gestion de la soumission du formulaire
     function handleFormSubmission() {
         const submission = {
             type: docTypeSelect.value,
@@ -82,15 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
             timestamp: new Date().toISOString()
         };
 
-        // Simulation de stockage
-        const submissions = JSON.parse(localStorage.getItem('documentSubmissions') || '[]');
-        submissions.push(submission);
-        localStorage.setItem('documentSubmissions', JSON.stringify(submissions));
-
         // Feedback utilisateur
         showSuccessMessage('Document soumis avec succès !');
     }
 
+    // Afficher un message de succès
     function showSuccessMessage(message) {
         const successDiv = document.createElement('div');
         successDiv.className = 'success-message';
@@ -100,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => successDiv.remove(), 3000);
     }
 
+    // Débouncing pour éviter les appels excessifs à la validation
     function debounce(func, wait) {
         let timeout;
         return (...args) => {
@@ -108,3 +112,4 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 });
+    

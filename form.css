@@ -1,0 +1,225 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --success-color: #27ae60;
+    --danger-color: #e74c3c;
+    --warning-color: #f1c40f;
+}
+
+/* Front Office Styles */
+.form-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.document-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+select, input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.submit-btn {
+    background: var(--secondary-color);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Back Office Styles */
+.admin-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.documents-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.documents-table th,
+.documents-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.documents-table th {
+    background: var(--primary-color);
+    color: white;
+}
+
+.status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.status.Enattente { background: var(--warning-color); }
+.status.Approuvé { background: var(--success-color); }
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+.delete-btn { background: var(--danger-color); }
+.approve-btn { background: var(--success-color); }
+
+@media (max-width: 768px) {
+    .documents-table td:nth-child(3),
+    .documents-table th:nth-child(3) {
+        display: none;
+    }
+}
+
+/* Barre d'outils */
+.toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.8rem 2.5rem 0.8rem 1rem;
+}
+
+.search-box i {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+/* Statistiques */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-card i {
+    font-size: 2rem;
+}
+
+.stat-card.pending { background: var(--warning-color); }
+.stat-card.approved { background: var(--success-color); }
+.stat-card.rejected { background: var(--danger-color); }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.pagination button {
+    padding: 0.5rem 1rem;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.invalid {
+    border: 2px solid #e74c3c !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+select, input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+select:focus, input:focus {
+    border-color: #3498db;
+    outline: none;
+}
