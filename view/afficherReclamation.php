@@ -313,7 +313,7 @@ $reclamations = $controller->getReclamations();
               <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
             </div>
             <div class="flex-grow-1 ms-3">
-              <h6 class="mb-1">Stebin Ben</h6>
+              <h6 class="mb-1">Med Salim Hmili</h6>
               <span>UI/UX Designer</span>
             </div>
             <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
@@ -362,21 +362,50 @@ $reclamations = $controller->getReclamations();
       
           <div class="d-flex align-items-center justify-content-between mb-3">
           <div class="reclamations-container">
-    <!-- Bouton pour ajouter une nouvelle réclamation -->
-   
-    <?php foreach ($reclamations as $r): ?>
-        <div class="reclamation-card" id="reclamation_<?= $r['id_reclamation'] ?>">
-            <h3><i class="ti ti-clipboard-text"></i> Réclamation #<?= $r['id_reclamation'] ?></h3>
-            <p><strong>Email:</strong> <?= htmlspecialchars($r['email']) ?></p>
-            <p><strong>Description:</strong> <?= htmlspecialchars($r['Description']) ?></p>
-            <p><strong>Date:</strong> <?= $r['date_reclamation'] ?></p>
-            <p><strong>Type:</strong> <?= htmlspecialchars($r['type_reclamation']) ?></p>
-            <div class="actions">
-                <button onclick="supprimerReclamation(<?= $r['id_reclamation'] ?>)">Supprimer</button>
-                <a href="modifierReclamation.php?id_reclamation=<?= $r['id_reclamation'] ?>" class="modifier-btn">Modifier</a>
-            </div>
-        </div>
-    <?php endforeach; ?>
+    <!-- Tableau des réclamations -->
+    <table class="reclamation-table">
+        <thead>
+            <tr>
+                <th><i class="ti ti-clipboard-text"></i> ID</th>
+                <th>Email</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($reclamations as $r): ?>
+            <tr id="reclamation_<?= $r['id_reclamation'] ?>">
+                <td>#<?= $r['id_reclamation'] ?></td>
+                <td><?= htmlspecialchars($r['email']) ?></td>
+                <td><?= htmlspecialchars($r['Description']) ?></td>
+                <td><?= $r['date_reclamation'] ?></td>
+                <td><?= htmlspecialchars($r['type_reclamation']) ?></td>
+                <td>
+                    <?php if (isset($r['statut']) && $r['statut'] == 'Répondu'): ?>
+                        <span class="badge bg-success"><?= $r['statut'] ?></span>
+                        <?php if (isset($r['date_reponse'])): ?>
+                            <br><small>Le <?= $r['date_reponse'] ?></small>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="badge bg-warning">En attente</span>
+                    <?php endif; ?>
+                </td>
+                <td class="actions">
+                    <?php if (!isset($r['statut']) || $r['statut'] != 'Répondu'): ?>
+                        <a href="repondreReclamation.php?id_reclamation=<?= $r['id_reclamation'] ?>" class="repondre-btn">Répondre</a>
+                    <?php else: ?>
+                        <a href="repondreReclamation.php?id_reclamation=<?= $r['id_reclamation'] ?>" class="repondre-btn repondre-disabled">Déjà répondu</a>
+                    <?php endif; ?>
+                    <button onclick="supprimerReclamation(<?= $r['id_reclamation'] ?>)" class="btn-supprimer">Supprimer</button>
+                    <a href="modifierReclamation.php?id_reclamation=<?= $r['id_reclamation'] ?>" class="modifier-btn">Modifier</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
   <!-- [Page Specific JS] start -->
   <script src="../assets/js/plugins/apexcharts.min.js"></script>
@@ -445,15 +474,38 @@ $reclamations = $controller->getReclamations();
 
 <!-- Ajouter du style pour le bouton modifier -->
 <style>
-    .reclamation-card {
+    .reclamation-table {
+        width: 100%;
         background-color: #ffffff;
-        border: 1px solid #e0e0e0;
+        border-collapse: collapse;
         border-radius: 10px;
-        padding: 20px;
-        width: calc(25% - 20px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .reclamation-table thead {
+        background-color: #2196f3;
+        color: white;
+    }
+
+    .reclamation-table th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+    }
+
+    .reclamation-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background-color 0.2s;
+    }
+
+    .reclamation-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .reclamation-table td {
+        padding: 15px;
+        vertical-align: middle;
     }
 
     .btn-ajouter {
@@ -467,35 +519,18 @@ $reclamations = $controller->getReclamations();
     transition: background-color 0.3s;
     margin-left: 20px;
 }
-    .reclamation-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
 
-    .reclamation-card h3 {
-        margin-top: 0;
-        color: #333;
-    }
-
-    .actions {
-        margin-top: 15px;
-    }
-
-    .actions button, .actions .modifier-btn {
-        margin-right: 10px;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s, color 0.2s;
-    }
-
-    .actions button {
+    .btn-supprimer {
         background-color: #f44336;
         color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background-color 0.2s;
     }
 
-    .actions button:hover {
+    .btn-supprimer:hover {
         background-color: #d32f2f;
     }
 
@@ -503,22 +538,67 @@ $reclamations = $controller->getReclamations();
         background-color: #2196f3;
         color: white;
         text-decoration: none;
+        border-radius: 5px;
+        padding: 8px 16px;
+        display: inline-block;
+        margin-left: 5px;
     }
 
     .modifier-btn:hover {
         background-color: #1976d2;
     }
     
+    .repondre-btn {
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        padding: 8px 16px;
+        display: inline-block;
+        margin-right: 5px;
+        transition: background-color 0.2s;
+    }
+    
+    .repondre-btn:hover {
+        background-color: #388E3C;
+    }
+    
+    .repondre-disabled {
+        background-color: #9E9E9E;
+        cursor: default;
+    }
+    
+    .repondre-disabled:hover {
+        background-color: #9E9E9E;
+    }
+    
+    .badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .bg-success {
+        background-color: #4CAF50;
+        color: white;
+    }
+    
+    .bg-warning {
+        background-color: #FFC107;
+        color: #212121;
+    }
+    
     .reclamations-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: flex-start;
         width: 100%;
         margin-left: 300px;
         margin-top: 100px;
+        padding-right: 20px;
     }
     
+    .actions {
+        white-space: nowrap;
+    }
 </style>
 
 

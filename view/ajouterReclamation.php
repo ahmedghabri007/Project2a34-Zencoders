@@ -5,7 +5,7 @@ $controller = new ReclamationController();
 $emails = $controller->getEmails();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="utf-8">
@@ -35,6 +35,58 @@ $emails = $controller->getEmails();
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .reclamation-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .reclamation-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .reclamation-form select,
+        .reclamation-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .reclamation-form .btn-submit {
+            width: 100%;
+            padding: 10px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .reclamation-form .btn-submit:hover {
+            background-color: #1976d2;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -49,18 +101,18 @@ $emails = $controller->getEmails();
         <div class="row gx-0">
             <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
                 <div class="d-inline-flex align-items-center" style="height: 45px;">
-                    <small class="me-3 text-light"><i class="fa fa-map-marker-alt me-2"></i>Esprit , Technopole Ghazela Ariena</small>
-                    <small class="me-3 text-light"><i class="fa fa-phone-alt me-2"></i>+216 97 118 435</small>
-                    <small class="text-light"><i class="fa fa-envelope-open me-2"></i>Mohamedsalim.Hmili@esprit.tn</small>
+                    <small class="me-3 text-light"><i class="fa fa-map-marker-alt me-2" aria-hidden="true"></i>Esprit, Technopole Ghazela Ariena</small>
+                    <small class="me-3 text-light"><i class="fa fa-phone-alt me-2" aria-hidden="true"></i>+216 97 118 435</small>
+                    <small class="text-light"><i class="fa fa-envelope-open me-2" aria-hidden="true"></i>Mohamedsalim.Hmili@esprit.tn</small>
                 </div>
             </div>
             <div class="col-lg-4 text-center text-lg-end">
                 <div class="d-inline-flex align-items-center" style="height: 45px;">
-                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-twitter fw-normal"></i></a>
-                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-facebook-f fw-normal"></i></a>
-                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-linkedin-in fw-normal"></i></a>
-                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-instagram fw-normal"></i></a>
-                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href=""><i class="fab fa-youtube fw-normal"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-twitter fw-normal" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-facebook-f fw-normal" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-linkedin-in fw-normal" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href="#"><i class="fab fa-instagram fw-normal" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href="#"><i class="fab fa-youtube fw-normal" aria-hidden="true"></i></a>
                 </div>
             </div>
         </div>
@@ -71,7 +123,7 @@ $emails = $controller->getEmails();
     <div class="container-fluid position-relative p-0">
         <nav class="navbar navbar-expand-lg navbar-dark px-5 py-3 py-lg-0">
             <a href="index.html" class="navbar-brand p-0">
-                <h1 class="m-0"><i class="fa fa-user-tie me-2"></i>Startup</h1>
+                <h1 class="m-0"><i class="fa fa-user-tie me-2" aria-hidden="true"></i>Startup</h1>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="fa fa-bars"></span>
@@ -101,7 +153,9 @@ $emails = $controller->getEmails();
                     <a href="contact.html" class="nav-item nav-link">Contact</a>
                     <a href="reclamation.html" class="nav-item nav-link active">Réclamation</a>
                 </div>
-                <butaton type="button" class="btn text-primary ms-3" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></butaton>
+                <button type="button" class="btn text-primary ms-3" data-bs-toggle="modal" data-bs-target="#searchModal">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
             </div>
         </nav>
 
@@ -145,35 +199,41 @@ $emails = $controller->getEmails();
             </div>
             <div class="row g-5">
                 <div class="col-lg-6 wow slideInUp" data-wow-delay="0.3s">
-                    <form action="traitementAjoutReclamation.php" method="POST">
-                        <label>Email :</label>
-                        <select name="email">
-                            <option value="">-- Choisir un email --</option>
-                            <?php foreach ($emails as $row): ?>
-                                <option value="<?= htmlspecialchars($row['email']) ?>">
-                                    <?= htmlspecialchars($row['email']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <span id="email-error" style="color: red;"></span>
-                        <br><br>
-                    
-                        <label>Description :</label><br>
-                        <textarea name="description" rows="4" cols="50"></textarea>
-                        <span id="description-error" style="color: red;"></span>
-                        <br><br>
-                    
-                        <label>Type de réclamation :</label>
-                        <select name="type" required>
-                            <option value="Technique">Technique</option>
-                            <option value="Support client">Support client</option>
-                            <option value="Amélioration">Amélioration</option>
-                        </select>
-                        <br><br>
-                    
-                        <input type="submit" value="Envoyer">
+                    <form id="reclamationForm" class="reclamation-form" action="traitementAjoutReclamation.php" method="POST">
+                        <div class="form-group">
+                            <label for="email">Email :</label>
+                            <select id="email" name="email" class="form-control" required>
+                                <option value="">-- Choisir un email --</option>
+                                <?php if (!empty($emails)): ?>
+                                    <?php foreach ($emails as $row): ?>
+                                        <option value="<?= htmlspecialchars($row['email']) ?>">
+                                            <?= htmlspecialchars($row['email']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <option value="">Aucun email disponible</option>
+                                <?php endif; ?>
+                            </select>
+                            <div id="email-error" class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description :</label>
+                            <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+                            <div id="description-error" class="error-message"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type">Type de réclamation :</label>
+                            <select id="type" name="type" class="form-control" required>
+                                <option value="Technique">Technique</option>
+                                <option value="Support client">Support client</option>
+                                <option value="Amélioration">Amélioration</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Envoyer</button>
                     </form>
-                    
                 </div>
                 <div class="col-lg-6 wow slideInUp" data-wow-delay="0.6s">
                     <div class="bg-light p-5 h-100">
@@ -181,7 +241,7 @@ $emails = $controller->getEmails();
                         <p class="mb-4">Votre réclamation sera traitée dans les plus brefs délais. Voici quelques informations utiles :</p>
                         <div class="d-flex align-items-center mb-4">
                             <div class="bg-primary d-flex align-items-center justify-content-center rounded" style="width: 60px; height: 60px;">
-                                <i class="fa fa-clock text-white"></i>
+                                <i class="fa fa-clock text-white" aria-hidden="true"></i>
                             </div>
                             <div class="ps-4">
                                 <h5 class="mb-2">Délai de traitement</h5>
@@ -190,7 +250,7 @@ $emails = $controller->getEmails();
                         </div>
                         <div class="d-flex align-items-center mb-4">
                             <div class="bg-primary d-flex align-items-center justify-content-center rounded" style="width: 60px; height: 60px;">
-                                <i class="fa fa-envelope-open text-white"></i>
+                                <i class="fa fa-envelope-open text-white" aria-hidden="true"></i>
                             </div>
                             <div class="ps-4">
                                 <h5 class="mb-2">Confirmation par email</h5>
@@ -199,7 +259,7 @@ $emails = $controller->getEmails();
                         </div>
                         <div class="d-flex align-items-center">
                             <div class="bg-primary d-flex align-items-center justify-content-center rounded" style="width: 60px; height: 60px;">
-                                <i class="fa fa-phone-alt text-white"></i>
+                                <i class="fa fa-phone-alt text-white" aria-hidden="true"></i>
                             </div>
                             <div class="ps-4">
                                 <h5 class="mb-2">Besoin d'aide urgente ?</h5>
@@ -220,7 +280,7 @@ $emails = $controller->getEmails();
                 <div class="col-lg-4 col-md-6 footer-about">
                     <div class="d-flex flex-column align-items-center justify-content-center text-center h-100 bg-primary p-4">
                         <a href="index.html" class="navbar-brand">
-                            <h1 class="m-0 text-white"><i class="fa fa-user-tie me-2"></i>Startup</h1>
+                            <h1 class="m-0 text-white"><i class="fa fa-user-tie me-2" aria-hidden="true"></i>Startup</h1>
                         </a>
                         <p class="mt-3 mb-4">Lorem diam sit erat dolor elitr et, diam lorem justo amet clita stet eos sit. Elitr dolor duo lorem, elitr clita ipsum sea. Diam amet erat lorem stet eos. Diam amet et kasd eos duo.</p>
                         <form action="">
@@ -239,7 +299,7 @@ $emails = $controller->getEmails();
                             </div>
                             <div class="d-flex mb-2">
                                 <i class="bi bi-geo-alt text-primary me-2"></i>
-                                <p class="mb-0">Esprit , Technopole Ghazela Ariena</p>
+                                <p class="mb-0">Esprit, Technopole Ghazela Ariena</p>
                             </div>
                             <div class="d-flex mb-2">
                                 <i class="bi bi-envelope-open text-primary me-2"></i>
@@ -250,10 +310,10 @@ $emails = $controller->getEmails();
                                 <p class="mb-0">+216 97 118 435</p>
                             </div>
                             <div class="d-flex mt-4">
-                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square" href="#"><i class="fab fa-instagram fw-normal"></i></a>
+                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-twitter fw-normal" aria-hidden="true"></i></a>
+                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-facebook-f fw-normal" aria-hidden="true"></i></a>
+                                <a class="btn btn-primary btn-square me-2" href="#"><i class="fab fa-linkedin-in fw-normal" aria-hidden="true"></i></a>
+                                <a class="btn btn-primary btn-square" href="#"><i class="fab fa-instagram fw-normal" aria-hidden="true"></i></a>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 pt-0 pt-lg-5 mb-5">
@@ -305,7 +365,7 @@ $emails = $controller->getEmails();
     <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded back-to-top"><i class="bi bi-arrow-up"></i></a>
 
     <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="lib/wow/wow.min.js"></script>
     <script src="lib/easing/easing.min.js"></script>
@@ -316,22 +376,57 @@ $emails = $controller->getEmails();
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
         $(document).ready(function() {
-            $('form').on('submit', function(event) {
-                event.preventDefault(); // Empêche le rechargement de la page
-
-                var formData = $(this).serialize();
-
+            // Validation et soumission du formulaire
+            $('#reclamationForm').on('submit', function(event) {
+                event.preventDefault();
+                
+                // Réinitialiser les messages d'erreur
+                $('.error-message').text('');
+                
+                // Validation
+                let isValid = true;
+                
+                // Validation de l'email
+                const email = $('#email').val();
+                if (!email) {
+                    $('#email-error').text('Veuillez sélectionner un email.');
+                    isValid = false;
+                }
+                
+                // Validation de la description
+                const description = $('#description').val().trim();
+                if (!description) {
+                    $('#description-error').text('La description ne peut pas être vide.');
+                    isValid = false;
+                } else if (description.length < 5) {
+                    $('#description-error').text('La description doit contenir au moins 5 caractères.');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    return false;
+                }
+                
+                // Soumission AJAX
                 $.ajax({
                     type: 'POST',
-                    url: 'traitementAjoutReclamation.php',
-                    data: formData,
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
                     success: function(response) {
-                        // Traitez la réponse ici
-                        alert('Réclamation soumise avec succès !');
+                        try {
+                            const result = JSON.parse(response);
+                            if (result.success) {
+                                alert('Réclamation soumise avec succès !');
+                                $('#reclamationForm')[0].reset();
+                            } else {
+                                alert('Erreur: ' + result.message);
+                            }
+                        } catch (e) {
+                            alert('Réclamation soumise avec succès !');
+                            $('#reclamationForm')[0].reset();
+                        }
                     },
                     error: function() {
                         alert('Une erreur est survenue lors de la soumission de la réclamation.');
@@ -340,77 +435,5 @@ $emails = $controller->getEmails();
             });
         });
     </script>
-
-    <script>
-        document.querySelector('form').addEventListener('submit', function(event) {
-            var email = document.querySelector('select[name="email"]').value;
-            var emailErrorElement = document.getElementById('email-error');
-            if (email === '') {
-                emailErrorElement.textContent = 'Veuillez sélectionner un email.';
-                event.preventDefault();
-            } else {
-                emailErrorElement.textContent = '';
-            }
-
-            var description = document.querySelector('textarea[name="description"]').value;
-            var errorElement = document.getElementById('description-error');
-            if (description.trim() === '') {
-                errorElement.textContent = 'La description ne peut pas être vide.';
-                event.preventDefault();
-            } else if (description.length < 5) {
-                errorElement.textContent = 'La description doit contenir au moins 5 caractères.';
-                event.preventDefault();
-            } else {
-                errorElement.textContent = '';
-            }
-        });
-    </script>
 </body>
-
-</html> 
-<style>
-    form {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    form label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #555;
-    }
-
-    form select,
-    form textarea,
-    form input[type="text"],
-    form input[type="email"] {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 16px;
-    }
-
-    form input[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        background-color: #2196f3;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-    }
-
-    form input[type="submit"]:hover {
-        background-color: #1976d2;
-    }
-</style>
+</html>
