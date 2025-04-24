@@ -89,10 +89,11 @@ try {
             <div class="match-card" data-profile='<?= json_encode($match, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'>
                 <h2><?= htmlspecialchars($match['fullname']) ?> (<?= $match['age'] ?> ans)</h2>
                 <p><strong>Profession:</strong> <?= htmlspecialchars($match['profession']) ?></p>
-                <p><strong>Intérêts:</strong> <?= htmlspecialchars($match['interests']) ?></p>
-                <p><strong>Genre:</strong> <?= htmlspecialchars($match['gender']) ?></p>
-                <p><strong>Localisation:</strong> <?= htmlspecialchars($match['location']) ?></p>
-                <p><strong>Biographie:</strong> <?= htmlspecialchars($match['biography']) ?></p>
+                <p><strong>Interests:</strong> <?= htmlspecialchars($match['interests']) ?></p>
+                <p><strong>Gender:</strong> <?= htmlspecialchars($match['gender']) ?></p>
+                <p><strong>Location:</strong> <?= htmlspecialchars($match['location']) ?></p>
+                <p><strong>Phone:</strong> <?= htmlspecialchars($match['phone']) ?></p>
+                <p><strong>biography:</strong> <?= htmlspecialchars($match['biography']) ?></p>
                 <button class="match-btn" onclick="matchProfile(this)">Match</button>
             </div>
         <?php endforeach; ?>
@@ -100,6 +101,25 @@ try {
         <p>Aucun profil trouvé avec les critères donnés.</p>
     <?php endif; ?>
 </div>
+<div class="form-container">
+        <h1>Add a Match</h1>
+        <form method="POST" action="addmatch.php">
+            <label>Matched Profile:</label>
+            <select name="idprofile" required>
+                <?php foreach ($profiles as $profile): ?>
+                    <option value="<?= $profile['idprofile'] ?>"><?= htmlspecialchars($profile['fullname']) ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <label>Match Type:</label>
+            <input type="text" name="match_type" required>
+
+            <label>Description:</label>
+            <textarea name="description" required></textarea>
+
+            <button type="submit">Add Match</button>
+        </form>
+    </div>
 
 <script>
     function matchProfile(button) {

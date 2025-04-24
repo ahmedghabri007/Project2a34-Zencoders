@@ -16,7 +16,7 @@ if (isset($_GET['delete'])) {
 // Update profile
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $pdo = Config::getConnexion();
-    $stmt = $pdo->prepare("UPDATE profile SET fullname = ?, age = ?, gender = ?, location = ?, profession = ?, biography = ?, interests = ? WHERE idprofile = ?");
+    $stmt = $pdo->prepare("UPDATE profile SET fullname = ?, age = ?, gender = ?, location = ?, profession = ?, biography = ?, interests = ?, phone = ? WHERE idprofile = ?");
     $stmt->execute([
         $_POST['fullname'],
         $_POST['age'],
@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $_POST['profession'],
         $_POST['biography'],
         $_POST['interests'],
+        $_POST['phone'],
         $_POST['idprofile']
     ]);
     header("Location: dashboard_profiles.php");
@@ -62,8 +63,15 @@ $profiles = $pdo->query("SELECT * FROM profile ORDER BY idprofile DESC")->fetchA
         <li class="nav-item active">
             <a class="nav-link" href="#">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+                <span>Profiles</span></a>
         </li>
+        <li class="nav-item">
+        <a class="nav-link" href="dashboard_matches.php">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Matches</span>
+        </a>
+        </li>
+
     </ul>
 
     <!-- Content Wrapper -->
@@ -95,6 +103,7 @@ $profiles = $pdo->query("SELECT * FROM profile ORDER BY idprofile DESC")->fetchA
                                         <th>Profession</th>
                                         <th>Biography</th>
                                         <th>Interests</th>
+                                        <th>Phone</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -104,19 +113,19 @@ $profiles = $pdo->query("SELECT * FROM profile ORDER BY idprofile DESC")->fetchA
                                             <form method="POST" action="dashboard_profiles.php">
                                                 <input type="hidden" name="idprofile" value="<?= $profile['idprofile'] ?>">
                                                 <td><?= $profile['idprofile'] ?></td>
-                                                <td><input type="text" name="fullname" class="form-control" value="<?= htmlspecialchars($profile['fullname']) ?>"></td>
-                                                <td><input type="number" name="age" class="form-control" value="<?= $profile['age'] ?>"></td>
+                                                <td><input type="text" name="fullname" class="form-control" value="<?= htmlspecialchars($profile['fullname'] ?? '') ?>"></td>
+                                                <td><input type="number" name="age" class="form-control" value="<?= htmlspecialchars($profile['age'] ?? '') ?>"></td>
                                                 <td>
                                                     <select name="gender" class="form-control">
                                                         <option value="Male" <?= $profile['gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
                                                         <option value="Female" <?= $profile['gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
-                                                        <option value="Other" <?= $profile['gender'] == 'Other' ? 'selected' : '' ?>>Other</option>
                                                     </select>
                                                 </td>
-                                                <td><input type="text" name="location" class="form-control" value="<?= htmlspecialchars($profile['location']) ?>"></td>
-                                                <td><input type="text" name="profession" class="form-control" value="<?= htmlspecialchars($profile['profession']) ?>"></td>
-                                                <td><textarea name="biography" class="form-control"><?= htmlspecialchars($profile['biography']) ?></textarea></td>
-                                                <td><textarea name="interests" class="form-control"><?= htmlspecialchars($profile['interests']) ?></textarea></td>
+                                                <td><input type="text" name="location" class="form-control" value="<?= htmlspecialchars($profile['location'] ?? '') ?>"></td>
+                                                <td><input type="text" name="profession" class="form-control" value="<?= htmlspecialchars($profile['profession'] ?? '') ?>"></td>
+                                                <td><textarea name="biography" class="form-control"><?= htmlspecialchars($profile['biography'] ?? '') ?></textarea></td>
+                                                <td><textarea name="interests" class="form-control"><?= htmlspecialchars($profile['interests'] ?? '') ?></textarea></td>
+                                                <td><input type="text" name="phone" class="form-control" value="<?= htmlspecialchars(string: $profile['phone'] ?? '') ?>"></td>
                                                 <td>
                                                     <button type="submit" name="update" class="btn btn-primary">Update</button>
                                                     <a href="?delete=<?= $profile['idprofile'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this profile?')">Delete</a>
