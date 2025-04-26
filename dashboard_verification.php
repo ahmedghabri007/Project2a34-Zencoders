@@ -37,10 +37,16 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Verification Dashboard</title>
-    <link rel="stylesheet" href="dashboard_verification.css"> <!-- You can change the path -->
-    <link rel="stylesheet" href="dashboard_verification.css">
+<meta charset="utf-8">
+    <title>Dashboard</title>
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <style>
+        .table td, .table th { vertical-align: middle; }
+        form { margin: 0; }
+        .btn { padding: 4px 10px; }
+        textarea { resize: vertical; }
+    </style>
 </head>
 <body>
     <div class="container">
