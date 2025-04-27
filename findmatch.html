@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Match</title>
+    <title>Create a Match</title>
     <link rel="stylesheet" href="match.css">
 </head>
 <body>
     <div class="form-container">
         <center><h1>Create a Match</h1></center>
-        <form method="POST" action="../Back_Office/findmatch.php" >
-            
-               <center> <label><i class="fas fa-user"></i> Full Name</label>
-                <input type="text" name="fullname" placeholder="Full Name" ><br></center>
-            
+        <form method="POST" action="../Back_Office/findmatch.php">
+            <center>
+                <label>Searcher Name:</label>
+                <input type="text" name="searcher_name">
+            </center>
             <center><button type="submit">Find your Match</button></center>
         </form>
     </div>
+
+    
 </body>
 </html>
