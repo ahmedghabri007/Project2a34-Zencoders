@@ -18,9 +18,9 @@ if (isset($_GET['delete'], $_GET['idprofile'])) {
 // Update match
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $pdo = Config::getConnexion();
-    $stmt = $pdo->prepare("UPDATE matches SET match_type = ?, description = ? WHERE idmatch = ?");
+    $stmt = $pdo->prepare("UPDATE matches SET searcher_name = ?, description = ? WHERE idmatch = ?");
     $stmt->execute([
-        $_POST['match_type'],
+        $_POST['searcher_name'],
         $_POST['description'],
         $_POST['idmatch']
     ]);
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 // Fetch all matches joined with profile name
 $pdo = Config::getConnexion();
 $sql = "
-    SELECT m.idmatch, m.match_type, m.description, m.date_created, m.idprofile, p.fullname
+    SELECT m.idmatch, m.searcher_name, m.description, m.date_created, m.idprofile, p.fullname
     FROM matches m
     JOIN profile p ON m.idprofile = p.idprofile
     ORDER BY m.idmatch DESC
@@ -91,8 +91,8 @@ $matches = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                                 <thead class="thead-light">
                                     <tr>
                                         <th>ID</th>
-                                        <th>Profile</th>
-                                        <th>Match Type</th>
+                                        <th>Full Name</th>
+                                        <th>Searcher Name</th>
                                         <th>Description</th>
                                         <th>Date Created</th>
                                         <th>Actions</th>
@@ -105,7 +105,7 @@ $matches = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                                                 <input type="hidden" name="idmatch" value="<?= $match['idmatch'] ?>">
                                                 <td><?= $match['idmatch'] ?></td>
                                                 <td><?= htmlspecialchars($match['fullname']) ?></td>
-                                                <td><input type="text" name="match_type" class="form-control" value="<?= htmlspecialchars($match['match_type']) ?>"></td>
+                                                <td><input type="text" name="searcher_name" class="form-control" value="<?= htmlspecialchars($match['searcher_name']) ?>"></td>
                                                 <td><textarea name="description" class="form-control"><?= htmlspecialchars($match['description']) ?></textarea></td>
                                                 <td><?= $match['date_created'] ?></td>
                                                 <td>

@@ -162,9 +162,9 @@ try {
             </select>
             <div class="error-message" id="error-idprofile"></div>
 
-            <label>Match Type:</label>
-            <input type="text" name="match_type">
-            <div class="error-message" id="error-match_type"></div>
+            <label>Searcher Name:</label>
+            <input type="text" name="searcher_name">
+            <div class="error-message" id="error-searcher_name"></div>
 
             <label>Description:</label>
             <textarea name="description"></textarea>
@@ -233,12 +233,12 @@ document.getElementById('add-match-form').addEventListener('submit', function(ev
     const form = event.target;
 
     const idprofile = form.querySelector('[name="idprofile"]').value.trim();
-    const matchType = form.querySelector('[name="match_type"]').value.trim();
+    const searcher_name = form.querySelector('[name="searcher_name"]').value.trim();
     const description = form.querySelector('[name="description"]').value.trim();
 
     // Réinitialiser les erreurs
     document.getElementById("error-idprofile").style.display = "none";
-    document.getElementById("error-match_type").style.display = "none";
+    document.getElementById("error-searcher_name").style.display = "none";
     document.getElementById("error-description").style.display = "none";
     document.getElementById("success-message").style.display = "none";
 
@@ -250,9 +250,9 @@ document.getElementById('add-match-form').addEventListener('submit', function(ev
         hasError = true;
     }
 
-    if (!matchType) {
-        document.getElementById("error-match_type").textContent = "❌ Le type de match est requis.";
-        document.getElementById("error-match_type").style.display = "block";
+    if (!searcher_name) {
+        document.getElementById("error-searcher_name").textContent = "❌ Le nom du chercheur est requis.";
+        document.getElementById("error-searcher_name").style.display = "block";
         hasError = true;
     }
 

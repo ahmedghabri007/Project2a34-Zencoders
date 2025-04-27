@@ -8,12 +8,16 @@ $pdo = Config::getConnexion();
 // Handle match form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idprofile = $_POST['idprofile'];
-    $match_type = $_POST['match_type'];
+    $searcher_name = $_POST['searcher_name'];
     $description = $_POST['description'];
     $date_created = date('Y-m-d H:i:s');
 
-    $stmt = $pdo->prepare("INSERT INTO matches (idprofile, match_type, description, date_created) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$idprofile, $match_type, $description, $date_created]);
+    $stmt = $pdo->prepare("INSERT INTO matches (idprofile, searcher_name, description, date_created) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$idprofile, $searcher_name, $description, $date_created]);
+
+    // Redirect to avoid resubmission on refresh
+    header("Location: addmatch.php");
+    exit;
 }
 
 // Fetch all profiles (for dropdown)
@@ -48,13 +52,14 @@ $matches = $pdo->query("
         <form method="POST" action="addmatch.php">
             <label>Matched Profile:</label>
             <select name="idprofile" required>
+                <option value="">-- Select Profile --</option>
                 <?php foreach ($profiles as $profile): ?>
                     <option value="<?= $profile['idprofile'] ?>"><?= htmlspecialchars($profile['fullname']) ?></option>
                 <?php endforeach; ?>
             </select>
 
-            <label>Match Type:</label>
-            <input type="text" name="match_type" required>
+            <label>Searcher Name:</label>
+            <input type="text" name="searcher_name" required>
 
             <label>Description:</label>
             <textarea name="description" required></textarea>
@@ -70,8 +75,8 @@ $matches = $pdo->query("
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Match Type</th>
+                        <th>Full Name (Matched)</th>
+                        <th>Searcher Name</th>
                         <th>Description</th>
                         <th>Date Created</th>
                     </tr>
@@ -81,7 +86,7 @@ $matches = $pdo->query("
                         <tr>
                             <td><?= $match['idmatch'] ?></td>
                             <td><?= htmlspecialchars($match['fullname']) ?></td>
-                            <td><?= htmlspecialchars($match['match_type']) ?></td>
+                            <td><?= htmlspecialchars($match['searcher_name']) ?></td>
                             <td><?= htmlspecialchars($match['description']) ?></td>
                             <td><?= $match['date_created'] ?></td>
                         </tr>
