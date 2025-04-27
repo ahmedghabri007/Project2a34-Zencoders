@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . '/../controller/ReclamationController.php';
+require_once __DIR__ . '/../controller/ResponseController.php';
+require_once __DIR__ . '/../cnx.php';
 
-$controller = new ReclamationController();
+$reclamationController = new ReclamationController();
+$responseController = new ResponseController();
 
 // Vérifier si l'ID de réclamation est présent dans l'URL
 if (!isset($_GET['id_reclamation']) || empty($_GET['id_reclamation'])) {
@@ -12,7 +15,7 @@ if (!isset($_GET['id_reclamation']) || empty($_GET['id_reclamation'])) {
 
 $id_reclamation = $_GET['id_reclamation'];
 // Récupérer les détails de la réclamation
-$reclamation = $controller->getReclamationById($id_reclamation);
+$reclamation = $reclamationController->getReclamationById($id_reclamation);
 
 // Vérifier si la réclamation existe
 if (!$reclamation) {
@@ -21,20 +24,54 @@ if (!$reclamation) {
     exit;
 }
 
+// Récupérer les réponses existantes pour cette réclamation
+$responses = $responseController->getResponsesByReclamation($id_reclamation);
+
+// Récupérer l'email de l'admin connecté
+$db = config::getConnexion();
+try {
+    // D'abord essayer de trouver un admin
+    $stmt = $db->prepare("SELECT email FROM accounts WHERE role = 'admin' LIMIT 1");
+    $stmt->execute();
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Si aucun admin n'est trouvé, prendre le premier utilisateur
+    if (!$admin) {
+        $stmt = $db->prepare("SELECT email FROM accounts LIMIT 1");
+        $stmt->execute();
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    $email_admin = $admin['email'] ?? null;
+
+    if (!$email_admin) {
+        // Si aucun utilisateur n'est trouvé, créer un utilisateur admin par défaut
+        $default_email = 'admin@system.com';
+        $default_password = password_hash('admin123', PASSWORD_DEFAULT);
+        
+        $stmt = $db->prepare("INSERT INTO accounts (email, password, role) VALUES (?, ?, 'admin')");
+        $stmt->execute([$default_email, $default_password]);
+        
+        $email_admin = $default_email;
+    }
+} catch (Exception $e) {
+    die("Erreur lors de la récupération de l'email admin: " . $e->getMessage());
+}
+
 // Traitement du formulaire de réponse
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reponse'])) {
     $reponse = trim($_POST['reponse']);
     
     if (!empty($reponse)) {
         // Enregistrer la réponse dans la base de données
-        $success = $controller->repondreReclamation($id_reclamation, $reponse);
+        $success = $responseController->createResponse($id_reclamation, $email_admin, $reponse);
         
         if ($success) {
             $message = "Votre réponse a été envoyée avec succès.";
             $messageType = "success";
             
-            // Rediriger vers la page d'affichage après 2 secondes
-            header("refresh:2;url=afficherReclamation.php");
+            // Rediriger vers la page d'historique après 2 secondes
+            header("refresh:2;url=historiqueReponses.php");
         } else {
             $message = "Une erreur s'est produite lors de l'envoi de votre réponse.";
             $messageType = "error";
@@ -69,6 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reponse'])) {
   <!-- [Template CSS Files] -->
   <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" >
   <link rel="stylesheet" href="../assets/css/style-preset.css" >
+
+  <!-- Validation JavaScript -->
+  <script src="js/validation.js"></script>
 </head>
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
@@ -103,7 +143,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reponse'])) {
           <li class="pc-item" style="background-color: #f0f0f0; border-left: 4px solid #ff0000;">
             <a href="afficherReclamation.php" class="pc-link">
               <span class="pc-micon"><i class="ti ti-alert-circle"></i></span>
-              <span class="pc-mtext">Reclamation</span>
+              <span class="pc-mtext">Réclamations</span>
+            </a>
+          </li>
+          <li class="pc-item" style="background-color: #f0f0f0; border-left: 4px solid #ff0000;">
+            <a href="historiqueReponses.php" class="pc-link">
+              <span class="pc-micon"><i class="ti ti-history"></i></span>
+              <span class="pc-mtext">Historique des Réponses</span>
             </a>
           </li>
         </ul>
@@ -213,22 +259,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reponse'])) {
               </div>
 
               <h5 class="mt-4 mb-3"><i class="ti ti-message-circle"></i> Votre réponse</h5>
-              <?php if (isset($reclamation['reponse']) && !empty($reclamation['reponse'])): ?>
+              <?php if (!empty($responses)): ?>
               <div class="alert alert-info">
-                <h6><i class="ti ti-check-circle"></i> Cette réclamation a déjà reçu une réponse</h6>
-                <div class="existing-response mt-3 p-3">
-                  <strong>Réponse envoyée le <?= isset($reclamation['date_reponse']) ? $reclamation['date_reponse'] : 'N/A' ?> :</strong>
-                  <p class="mt-2"><?= nl2br(htmlspecialchars($reclamation['reponse'])) ?></p>
+                <h6><i class="ti ti-history"></i> Historique des réponses</h6>
+                <div class="responses-history mt-3">
+                  <?php foreach ($responses as $response): ?>
+                    <div class="response-item p-3 mb-3" style="background-color: #f8f9fa; border-left: 4px solid #2196f3; border-radius: 4px;">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">Réponse du <?= $response['date_reponse'] ?></small>
+                        <div>
+                          <a href="modifierReponse.php?id=<?= $response['id_reponse'] ?>" class="btn btn-primary btn-sm">
+                            <i class="ti ti-edit"></i>
+                          </a>
+                          <a href="supprimerReponse.php?id=<?= $response['id_reponse'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?')">
+                            <i class="ti ti-trash"></i>
+                          </a>
+                        </div>
+                      </div>
+                      <p class="mb-0"><?= nl2br(htmlspecialchars($response['contenu_reponse'])) ?></p>
+                    </div>
+                  <?php endforeach; ?>
                 </div>
-                <p class="mt-3">Vous pouvez mettre à jour cette réponse ci-dessous :</p>
               </div>
               <?php endif; ?>
-              <form method="POST" action="">
+              <form method="POST" action="" class="reponse-form" id="reponseForm">
                 <div class="form-group mb-3">
-                  <textarea name="reponse" class="form-control" rows="5" placeholder="Écrivez votre réponse ici..."><?= isset($reclamation['reponse']) ? htmlspecialchars($reclamation['reponse']) : '' ?></textarea>
+                  <textarea name="reponse" id="contenu" class="form-control" rows="5" placeholder="Écrivez votre réponse ici..."></textarea>
+                  <div id="contenu-error" class="error-message"></div>
                 </div>
                 <div class="d-flex">
-                  <button type="submit" class="btn btn-success">Envoyer la réponse</button>
+                  <button type="submit" class="btn btn-success btn-submit">Envoyer la réponse</button>
                   <a href="afficherReclamation.php" class="btn btn-secondary ms-2">Annuler</a>
                 </div>
               </form>
@@ -288,10 +348,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reponse'])) {
     min-height: 100px;
   }
   
-  .existing-response {
-    background-color: #f8f9fa;
-    border-left: 4px solid #2196f3;
+  .responses-history {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .response-item {
+    transition: all 0.3s ease;
+  }
+  
+  .response-item:hover {
+    background-color: #e9ecef !important;
+  }
+
+  .reponse-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .reponse-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+  }
+
+  .reponse-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  .reponse-form .btn-submit {
+    width: 100%;
+    padding: 10px;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  .reponse-form .btn-submit:hover {
+    background-color: #1976d2;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: -10px;
+    margin-bottom: 10px;
   }
 </style>
 </html> 

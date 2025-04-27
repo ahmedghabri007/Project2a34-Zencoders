@@ -12,15 +12,33 @@ class ReclamationModel
 
     public function getAllReclamations()
     {
-        $stmt = $this->db->query("SELECT * FROM reclamation");
+        $sql = "SELECT r.*, a.email 
+                FROM reclamation r 
+                LEFT JOIN accounts a ON r.email = a.email 
+                ORDER BY r.date_reclamation DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
-    public function getAllEmails()
-{
-    $stmt = $this->db->query("SELECT email FROM accounts");
-    return $stmt->fetchAll();
-}
 
+    public function getReclamationsByEmail($email)
+    {
+        $sql = "SELECT r.*, a.email 
+                FROM reclamation r 
+                LEFT JOIN accounts a ON r.email = a.email 
+                WHERE r.email LIKE :email 
+                ORDER BY r.date_reclamation DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':email', '%' . $email . '%', PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getAllEmails()
+    {
+        $stmt = $this->db->query("SELECT email FROM accounts");
+        return $stmt->fetchAll();
+    }
 
     public function getReclamationById($id_reclamation)
     {
@@ -55,6 +73,15 @@ class ReclamationModel
             ':description' => $description,
             ':type' => $type,
             ':id' => $id
+        ]);
+    }
+    
+    public function repondreReclamation($id_reclamation, $reponse)
+    {
+        $stmt = $this->db->prepare("UPDATE reclamation SET reponse = :reponse, date_reponse = NOW() WHERE id_reclamation = :id_reclamation");
+        return $stmt->execute([
+            ':reponse' => $reponse,
+            ':id_reclamation' => $id_reclamation
         ]);
     }
 }

@@ -15,6 +15,10 @@ class ReclamationController
         return $this->model->getAllReclamations();
     }
     
+    public function getReclamationsByEmail($email)
+    {
+        return $this->model->getReclamationsByEmail($email);
+    }
 
     public function ajouter($email, $description, $type)
     {
@@ -42,4 +46,8 @@ class ReclamationController
      return $result;  // Retourner true si la mise à jour a réussi, sinon false
  }
  
+ public function repondreReclamation($id_reclamation, $reponse)
+ {
+     return $this->model->repondreReclamation($id_reclamation, $reponse);
+ }
 }

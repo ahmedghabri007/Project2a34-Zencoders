@@ -3,6 +3,32 @@ require_once __DIR__ . '/../controller/ReclamationController.php';
 
 $controller = new ReclamationController();
 $emails = $controller->getEmails();
+
+// Traitement du formulaire
+$message = '';
+$messageType = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $type = $_POST['type'] ?? '';
+
+    if ($email && $description && $type) {
+        try {
+            $controller->ajouter($email, $description, $type);
+            $message = 'Votre réclamation a été envoyée avec succès.';
+            $messageType = 'success';
+            // Réinitialiser les champs du formulaire
+            $_POST = array();
+        } catch (Exception $e) {
+            $message = 'Une erreur est survenue lors de l\'envoi de votre réclamation.';
+            $messageType = 'error';
+        }
+    } else {
+        $message = 'Veuillez remplir tous les champs obligatoires.';
+        $messageType = 'error';
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -35,6 +61,13 @@ $emails = $controller->getEmails();
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+
+    <!-- Validation JavaScript -->
+    <script src="js/validation.js"></script>
+
+    <script>
+        const availableEmails = <?= json_encode($emails) ?>;
+    </script>
 
     <style>
         .reclamation-form {
@@ -199,10 +232,15 @@ $emails = $controller->getEmails();
             </div>
             <div class="row g-5">
                 <div class="col-lg-6 wow slideInUp" data-wow-delay="0.3s">
-                    <form id="reclamationForm" class="reclamation-form" action="traitementAjoutReclamation.php" method="POST">
+                    <form id="reclamationForm" class="reclamation-form" method="POST">
+                        <?php if ($message): ?>
+                            <div class="alert alert-<?= $messageType ?>">
+                                <?= $message ?>
+                            </div>
+                        <?php endif; ?>
                         <div class="form-group">
                             <label for="email">Email :</label>
-                            <select id="email" name="email" class="form-control" required>
+                            <select id="email" name="email" class="form-control">
                                 <option value="">-- Choisir un email --</option>
                                 <?php if (!empty($emails)): ?>
                                     <?php foreach ($emails as $row): ?>
@@ -219,13 +257,13 @@ $emails = $controller->getEmails();
 
                         <div class="form-group">
                             <label for="description">Description :</label>
-                            <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+                            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
                             <div id="description-error" class="error-message"></div>
                         </div>
 
                         <div class="form-group">
                             <label for="type">Type de réclamation :</label>
-                            <select id="type" name="type" class="form-control" required>
+                            <select id="type" name="type" class="form-control">
                                 <option value="Technique">Technique</option>
                                 <option value="Support client">Support client</option>
                                 <option value="Amélioration">Amélioration</option>
@@ -377,61 +415,37 @@ $emails = $controller->getEmails();
     <script src="js/main.js"></script>
 
     <script>
-        $(document).ready(function() {
-            // Validation et soumission du formulaire
-            $('#reclamationForm').on('submit', function(event) {
-                event.preventDefault();
-                
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('reclamationForm').addEventListener('submit', function(event) {
                 // Réinitialiser les messages d'erreur
-                $('.error-message').text('');
-                
-                // Validation
+                document.getElementById('email-error').textContent = '';
+                document.getElementById('description-error').textContent = '';
                 let isValid = true;
-                
-                // Validation de l'email
-                const email = $('#email').val();
+
+                // Contrôle email
+                const email = document.getElementById('email').value;
                 if (!email) {
-                    $('#email-error').text('Veuillez sélectionner un email.');
+                    document.getElementById('email-error').textContent = 'Veuillez sélectionner un email.';
                     isValid = false;
                 }
-                
-                // Validation de la description
-                const description = $('#description').val().trim();
+                // Contrôle description
+                const description = document.getElementById('description').value.trim();
                 if (!description) {
-                    $('#description-error').text('La description ne peut pas être vide.');
+                    document.getElementById('description-error').textContent = 'La description ne peut pas être vide.';
                     isValid = false;
                 } else if (description.length < 5) {
-                    $('#description-error').text('La description doit contenir au moins 5 caractères.');
+                    document.getElementById('description-error').textContent = 'La description doit contenir au moins 5 caractères.';
                     isValid = false;
                 }
-                
-                if (!isValid) {
-                    return false;
+                // Contrôle type
+                const type = document.getElementById('type').value;
+                if (!type) {
+                    alert('Veuillez sélectionner un type de réclamation.');
+                    isValid = false;
                 }
-                
-                // Soumission AJAX
-                $.ajax({
-                    type: 'POST',
-                    url: $(this).attr('action'),
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        try {
-                            const result = JSON.parse(response);
-                            if (result.success) {
-                                alert('Réclamation soumise avec succès !');
-                                $('#reclamationForm')[0].reset();
-                            } else {
-                                alert('Erreur: ' + result.message);
-                            }
-                        } catch (e) {
-                            alert('Réclamation soumise avec succès !');
-                            $('#reclamationForm')[0].reset();
-                        }
-                    },
-                    error: function() {
-                        alert('Une erreur est survenue lors de la soumission de la réclamation.');
-                    }
-                });
+                if (!isValid) {
+                    event.preventDefault();
+                }
             });
         });
     </script>
