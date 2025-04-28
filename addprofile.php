@@ -9,12 +9,14 @@ $success = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fullname = trim($_POST['fullname']);
     $age = intval($_POST['age']);
-    $gender = $_POST['gender'];
+    $gender = trim($_POST['gender']);
     $location = trim($_POST['location']);
     $profession = trim($_POST['profession']);
     $interests = trim($_POST['interests']);
     $biography = trim($_POST['biography']);
     $phone = trim($_POST['phone']); // Get the phone number
+
+    
 
     if (empty($fullname) || empty($age) || empty($gender) || empty($location) || empty($profession) || empty($interests) || empty($biography) || empty($phone)) {
         $error = "Tous les champs sont obligatoires.";

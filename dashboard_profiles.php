@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $stmt->execute([
         $_POST['fullname'],
         $_POST['age'],
-        $_POST['gender'],
+        $_POST['gender'],  // Ensure gender is being passed
         $_POST['location'],
         $_POST['profession'],
         $_POST['biography'],
@@ -71,7 +71,24 @@ $profiles = $pdo->query("SELECT * FROM profile ORDER BY idprofile DESC")->fetchA
             <span>Matches</span>
         </a>
         </li>
-
+        <li class="nav-item">
+        <a class="nav-link" href="dashboard_search.php">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Search</span>
+        </a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="dashboard_stat.php">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Statistics</span>
+        </a>
+        </li>
+        <li class="nav-item">
+        <a class="nav-link" href="dashboard_tri.php">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Sort</span>
+        </a>
+        </li>
     </ul>
 
     <!-- Content Wrapper -->
@@ -117,15 +134,15 @@ $profiles = $pdo->query("SELECT * FROM profile ORDER BY idprofile DESC")->fetchA
                                                 <td><input type="number" name="age" class="form-control" value="<?= htmlspecialchars($profile['age'] ?? '') ?>"></td>
                                                 <td>
                                                     <select name="gender" class="form-control">
-                                                        <option value="Male" <?= $profile['gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
-                                                        <option value="Female" <?= $profile['gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
+                                                        <option value="M" <?= $profile['gender'] == 'M' ? 'selected' : '' ?>>Male</option>
+                                                        <option value="F" <?= $profile['gender'] == 'F' ? 'selected' : '' ?>>Female</option>
                                                     </select>
                                                 </td>
                                                 <td><input type="text" name="location" class="form-control" value="<?= htmlspecialchars($profile['location'] ?? '') ?>"></td>
                                                 <td><input type="text" name="profession" class="form-control" value="<?= htmlspecialchars($profile['profession'] ?? '') ?>"></td>
                                                 <td><textarea name="biography" class="form-control"><?= htmlspecialchars($profile['biography'] ?? '') ?></textarea></td>
                                                 <td><textarea name="interests" class="form-control"><?= htmlspecialchars($profile['interests'] ?? '') ?></textarea></td>
-                                                <td><input type="text" name="phone" class="form-control" value="<?= htmlspecialchars(string: $profile['phone'] ?? '') ?>"></td>
+                                                <td><input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($profile['phone'] ?? '') ?>"></td>
                                                 <td>
                                                     <button type="submit" name="update" class="btn btn-primary">Update</button>
                                                     <a href="?delete=<?= $profile['idprofile'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this profile?')">Delete</a>
