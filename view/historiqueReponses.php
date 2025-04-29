@@ -65,6 +65,12 @@ $responses = $responseController->getAllResponses();
                             <span class="pc-mtext">Historique des Réponses</span>
                         </a>
                     </li>
+                    <li class="pc-item">
+                        <a href="statistiquesReclamation.php" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
+                            <span class="pc-mtext">Statistiques</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

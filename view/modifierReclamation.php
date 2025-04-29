@@ -60,8 +60,45 @@ if (isset($_GET['id_reclamation'])) {
 
 <script>
     $(document).ready(function() {
+        // Fonction de validation
+        function validateForm() {
+            let isValid = true;
+            const description = $('textarea[name="description"]').val().trim();
+            const typeReclamation = $('select[name="type_reclamation"]').val();
+            const email = $('select[name="email"]').val();
+
+            // Validation de la description
+            if (description === '') {
+                $('#description-error').text('La description est obligatoire');
+                isValid = false;
+            } else if (description.length < 10) {
+                $('#description-error').text('La description doit contenir au moins 10 caractères');
+                isValid = false;
+            } else {
+                $('#description-error').text('');
+            }
+
+            // Validation du type de réclamation
+            if (typeReclamation === '') {
+                alert('Veuillez sélectionner un type de réclamation');
+                isValid = false;
+            }
+
+            // Validation de l'email
+            if (email === '') {
+                alert('Veuillez sélectionner un email');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
         $('form').on('submit', function(event) {
             event.preventDefault(); // Empêche le rechargement de la page
+
+            if (!validateForm()) {
+                return false;
+            }
 
             var formData = $(this).serialize();
 
@@ -70,14 +107,25 @@ if (isset($_GET['id_reclamation'])) {
                 url: 'traitementModifierReclamation.php',
                 data: formData,
                 success: function(response) {
-                    // Traitez la réponse ici
                     alert('Réclamation mise à jour avec succès !');
-                    window.location.href = 'afficherReclamation.php'; // Redirection après succès
+                    window.location.href = 'afficherReclamation.php';
                 },
                 error: function() {
                     alert('Une erreur est survenue lors de la mise à jour de la réclamation.');
                 }
             });
+        });
+
+        // Validation en temps réel pour la description
+        $('textarea[name="description"]').on('input', function() {
+            const description = $(this).val().trim();
+            if (description === '') {
+                $('#description-error').text('La description est obligatoire');
+            } else if (description.length < 10) {
+                $('#description-error').text('La description doit contenir au moins 10 caractères');
+            } else {
+                $('#description-error').text('');
+            }
         });
     });
 </script>

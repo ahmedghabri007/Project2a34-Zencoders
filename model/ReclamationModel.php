@@ -12,10 +12,7 @@ class ReclamationModel
 
     public function getAllReclamations()
     {
-        $sql = "SELECT r.*, a.email 
-                FROM reclamation r 
-                LEFT JOIN accounts a ON r.email = a.email 
-                ORDER BY r.date_reclamation DESC";
+        $sql = "SELECT id_reclamation, email, Description, type_reclamation, date_reclamation FROM reclamation ORDER BY date_reclamation DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll();
@@ -23,11 +20,7 @@ class ReclamationModel
 
     public function getReclamationsByEmail($email)
     {
-        $sql = "SELECT r.*, a.email 
-                FROM reclamation r 
-                LEFT JOIN accounts a ON r.email = a.email 
-                WHERE r.email LIKE :email 
-                ORDER BY r.date_reclamation DESC";
+        $sql = "SELECT id_reclamation, email, Description, type_reclamation, date_reclamation FROM reclamation WHERE email LIKE :email ORDER BY date_reclamation DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', '%' . $email . '%', PDO::PARAM_STR);
         $stmt->execute();
@@ -42,7 +35,8 @@ class ReclamationModel
 
     public function getReclamationById($id_reclamation)
     {
-        $stmt = $this->db->prepare("SELECT * FROM reclamation WHERE id_reclamation = :id_reclamation");
+        $sql = "SELECT id_reclamation, email, Description, type_reclamation, date_reclamation FROM reclamation WHERE id_reclamation = :id_reclamation";
+        $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id_reclamation', $id_reclamation, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch();

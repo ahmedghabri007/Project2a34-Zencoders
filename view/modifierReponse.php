@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contenu_reponse'])) {
 
                             <form method="POST" action="" class="reponse-form" id="reponseForm">
                                 <div class="form-group mb-3">
-                                    <textarea name="reponse" id="contenu" class="form-control" rows="5" placeholder="Écrivez votre réponse ici..."><?= htmlspecialchars($response['contenu_reponse']) ?></textarea>
+                                    <textarea name="contenu_reponse" id="contenu" class="form-control" rows="5" placeholder="Écrivez votre réponse ici..."><?= htmlspecialchars($response['contenu_reponse']) ?></textarea>
                                     <div id="contenu-error" class="error-message"></div>
                                 </div>
                                 <div class="d-flex">
@@ -194,5 +194,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contenu_reponse'])) {
     <script>layout_rtl_change('false');</script>
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
+    <script>
+        $(document).ready(function() {
+            // Fonction de validation
+            function validateForm() {
+                let isValid = true;
+                const contenu = $('#contenu').val().trim();
+
+                // Validation du contenu
+                if (contenu === '') {
+                    $('#contenu-error').text('Le contenu de la réponse est obligatoire');
+                    isValid = false;
+                } else if (contenu.length < 10) {
+                    $('#contenu-error').text('Le contenu doit contenir au moins 10 caractères');
+                    isValid = false;
+                } else {
+                    $('#contenu-error').text('');
+                }
+
+                return isValid;
+            }
+
+            $('#reponseForm').on('submit', function(event) {
+                event.preventDefault(); // Empêche le rechargement de la page
+
+                if (!validateForm()) {
+                    return false;
+                }
+
+                var formData = $(this).serialize();
+                formData += '&id=<?= $id_reponse ?>'; // Ajout de l'ID de la réponse
+
+                $.ajax({
+                    type: 'POST',
+                    url: '', // Envoi à la même page
+                    data: formData,
+                    success: function(response) {
+                        alert('Réponse mise à jour avec succès !');
+                        window.location.href = 'historiqueReponses.php';
+                    },
+                    error: function() {
+                        alert('Une erreur est survenue lors de la mise à jour de la réponse.');
+                    }
+                });
+            });
+
+            // Validation en temps réel pour le contenu
+            $('#contenu').on('input', function() {
+                const contenu = $(this).val().trim();
+                if (contenu === '') {
+                    $('#contenu-error').text('Le contenu de la réponse est obligatoire');
+                } else if (contenu.length < 10) {
+                    $('#contenu-error').text('Le contenu doit contenir au moins 10 caractères');
+                } else {
+                    $('#contenu-error').text('');
+                }
+            });
+        });
+    </script>
 </body>
 </html> 
