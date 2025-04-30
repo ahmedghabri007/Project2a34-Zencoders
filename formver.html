@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Badge Upgrade</title>
+  <link rel="stylesheet" href="formth.css">
+  <link rel="stylesheet" href="badge-upgrade.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+  <div class="form-container">
+
+    <!-- Current Badge Info -->
+    <section class="current-badge">
+      <h2><i class="fas fa-medal"></i> Your Current Badge</h2>
+      <p><strong>Badge Type:</strong> Silver</p>
+      <p><strong>Confidence Level:</strong> 75%</p>
+      <p><strong>Date Awarded:</strong> 2025-04-20</p>
+      <p><strong>Status:</strong> <span class="status Approuvé">Approved</span></p>
+      <p><strong>Rejected Reason:</strong> document approved</p>
+      <p><strong>Last Reviewed:</strong> 2025-04-28 10:00</p>
+      <p><strong>Notes:</strong> this is great</p>
+      <p><strong>Report Status:</strong> Requesting upgrade due to verified business registration</p>
+      <p><strong>Report Reviewed At:</strong> <span class="status Enattente">Pending</span></p>
+    </section>
+
+    <hr />
+
+    <!-- Upgrade Request History -->
+    <section>
+      <h2><i class="fas fa-history"></i> Your Upgrade Request History</h2>
+      <table class="upgrade-history">
+        <thead>
+          <tr>
+            <th>Request Date</th>
+            <th>Document Type</th>
+            <th>Document Number</th>
+            <th>Status</th>
+            <th>Admin Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-04-25</td>
+            <td>Birth Certificate</td>
+            <td>123456789</td>
+            <td class="status-pending">Pending</td>
+            <td>–</td>
+          </tr>
+          <tr>
+            <td>2025-04-22</td>
+            <td>Driver License</td>
+            <td>AB987654</td>
+            <td class="status-rejected">Rejected</td>
+            <td>Document already used</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr />
+
+    <!-- New Upgrade Request -->
+    <section>
+      <h2><i class="fas fa-file-upload"></i> Request a Badge Upgrade</h2>
+      <form
+        id="documentForm"
+        class="document-form"
+        method="POST"
+        action="../Back_Office/add_badge_upgrade.php"
+        enctype="multipart/form-data"
+      >
+        <div class="form-group">
+          <label for="document_type">
+            <i class="fas fa-file-alt"></i> Document Type:
+          </label>
+          <select id="document_type" name="document_type">
+            <option value="">Select…</option>
+            <option value="Passport">Passport</option>
+            <option value="National ID">National ID</option>
+            <option value="Driver License">Driver License</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="document_number">
+            <i class="fas fa-hashtag"></i> Document Number:
+          </label>
+          <input
+            type="text"
+            id="document_number"
+            name="document_number"
+            pattern="[A-Z0-9]{8,12}"
+            placeholder="Ex: AB12345678"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="document_file">
+            <i class="fas fa-upload"></i> Upload Document:
+          </label>
+          <input
+            type="file"
+            id="document_file"
+            name="document_file"
+            accept=".jpg,.jpeg,.png,.pdf"
+          />
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-paper-plane"></i> Submit
+        </button>
+      </form>
+    </section>
+  </div>
+
+  <script src="verification.js"></script>
+</body>
+</html>

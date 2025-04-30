@@ -9,7 +9,7 @@ if (isset($_GET['delete'])) {
     $pdo = Config::getConnexion();
     $stmt = $pdo->prepare("DELETE FROM verification WHERE id = ?");
     $stmt->execute([$id]);
-    header("Location: dashboard_verification.php");
+    header("Location: list_verification.php");
     exit();
 }
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $_POST['status'],
         $_POST['id']
     ]);
-    header("Location: dashboard_verification.php");
+    header("Location: list_verification.php");
     exit();
 }
 
@@ -52,13 +52,30 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-            <div class="sidebar-brand-text mx-3">Verification</div>
+            <div class="sidebar-brand-text mx-3">Elev8Talent</div>
         </a>
         <hr class="sidebar-divider my-0">
         <li class="nav-item active">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="list_verification.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+                <span>Verification</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="dashboard_search.php">
+                <i class="fas fa-fw fa-id-card"></i>
+                <span>Search Verification</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="dashboard_stat.php">
+                <i class="fas fa-fw fa-id-card"></i>
+                <span>Statistics Verification</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="list_badge_upgrade.php">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Upgrade</span></a>
         </li>
     </ul>
 
@@ -91,7 +108,7 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
                                 <tbody>
                                     <?php foreach ($verifications as $doc): ?>
                                         <tr>
-                                            <form method="POST" action="dashboard_verification.php">
+                                            <form method="POST" action="list_verification.php">
                                                 <input type="hidden" name="id" value="<?= $doc['id'] ?>">
                                                 <td><?= $doc['id'] ?></td>
                                                 <td>
