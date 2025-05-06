@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send SMS</title>
+</head>
+<body>
+    <h2>Send SMS via Twilio</h2>
+    <form action="../Back_Office/send_sms.php" method="POST">
+        <label for="phone_number">Phone Number:</label><br>
+        <input type="text" name="phone_number" id="phone_number" placeholder="+1234567890" required><br><br>
+
+        <label for="message">Message:</label><br>
+        <textarea name="message" id="message" rows="4" required></textarea><br><br>
+
+        <input type="submit" value="Send SMS">
+    </form>
+</body>
+</html>
