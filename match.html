@@ -173,156 +173,266 @@
     <!-- Vendor End -->
     
         <!--chatbot Start-->
+    
 
-    <!-- Bouton Assistant Flottant -->
-<button id="askAIButton" class="btn btn-gradient shadow-lg position-fixed"
-style="bottom: 30px; right: 30px; z-index: 9999; font-size: 20px; padding: 15px 25px; border-radius: 50px; font-weight: bold; background: linear-gradient(135deg, #007bff, #0984e3); color: white; transition: transform 0.2s ease-in-out;"
-onmouseover="this.style.transform='scale(1.05)'"
-onmouseout="this.style.transform='scale(1)'">
-🤖 Assistant StartUp
-</button>
-
-<!-- Modal Assistant IA -->
-<div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-<div class="modal-content" style="border-radius: 15px;">
-    <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="aiModalLabel" style="font-size: 22px; font-weight: bold;">
-            🤖 Assistant AI Startup
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body bg-light">
-        <input type="text" id="questionInput" class="form-control" placeholder="Ask your question here..." style="font-size: 16px; border-radius: 10px; border: 2px solid #007bff;">
-        <div id="loader" class="spinner-border text-primary d-none mt-3" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <title>Voice Chatbot Assistant</title>
+        <style>
+            #askAIButton {
+                bottom: 30px;
+                right: 30px;
+                z-index: 9999;
+                font-size: 20px;
+                padding: 15px 25px;
+                border-radius: 50px;
+                font-weight: bold;
+                background: linear-gradient(135deg, #007bff, #0984e3);
+                color: white;
+                transition: transform 0.2s ease-in-out;
+                position: fixed;
+            }
+    
+            #askAIButton:hover {
+                transform: scale(1.05);
+            }
+    
+            #microphone-btn {
+                background-color: #ff5733;
+                color: white;
+                font-size: 18px;
+                border-radius: 50%;
+                padding: 12px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+    
+            #microphone-btn:hover {
+                background-color: #e04d2b;
+            }
+    
+            #geminiResponse {
+                min-height: 100px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="askAIButton">🤖 Assistant StartUp</button>
+    
+        <div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="border-radius: 15px;">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="aiModalLabel">🤖 Assistant AI Startup</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body bg-light">
+                        <input type="text" id="questionInput" class="form-control" placeholder="Ask your question here...">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <button id="microphone-btn">🎤</button>
+                            <div id="loader" class="spinner-border text-primary d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div id="geminiResponse" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer bg-primary">
+                        <button type="button" id="askButton" class="btn btn-success btn-lg">Ask me any question🚀</button>
+                        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="geminiResponse" class="mt-3" style="font-size: 18px; color: #2d3436;"></div>
-    </div>
-    <div class="modal-footer bg-primary">
-        <button type="button" id="askButton" class="btn btn-success btn-lg" style="border-radius: 50px;">
-            Ask me any question🚀
-        </button>
-        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal" style="border-radius: 50px;">
-            Close
-        </button>
-    </div>
-</div>
-</div>
-</div>
-
-<!-- Librairies -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Script Assistant IA -->
-<script>
-document.getElementById('askAIButton').addEventListener('click', function () {
-const modal = new bootstrap.Modal(document.getElementById('aiModal'));
-modal.show();
-});
-
-document.getElementById('askButton').addEventListener('click', async function () {
-const userQuestion = document.getElementById('questionInput').value.trim();
-const loader = document.getElementById('loader');
-const responseContainer = document.getElementById('geminiResponse');
-
-if (userQuestion === "") {
-    responseContainer.innerHTML = "<span class='text-danger'>Veuillez entrer une question.</span>";
-    return;
-}
-
-loader.classList.remove("d-none");
-responseContainer.innerHTML = "";
-
-const fullPrompt = `
-Tu es un assistant IA dédié aux fondateurs de startups. 
-Réponds en anglais aux questions portant sur :
-this website is for making match for investor and entrepreneur so you re responsible for finding match for them so when i ask you to find me a match you should find me a profile from my website i am an investor and those are all my entrepreneur profiles
-1/ Bassem Hamraoui (39 ans)
-Profession: actor
-Interests: acting, musique
-Gender: M
-Location: Tunisia, Tunis
-Phone: 50111222
-Biography: An enigmatic presence graced the screen, leaving an indelible mark through nuanced performances and a captivating aura. 2/Zied Mbadra (20 ans)
-Profession: Etudiant
-Interests: Movies, Reading
-Gender: M
-Location: Tunisia, Tunis
-Phone: 92330556
-Biography: A bright and enthusiastic student with a passion for learning and a natural curiosity about the world. 3/ Mouhamed Khaireddine (20 ans)
-Profession: Ingenieur
-Interests: Football, Video games
-Gender: M
-Location: Tunisia, Tunis
-Phone: 55067187
-Biography: Driven by intellectual curiosity and a thirst for knowledge, this exceptional student consistently demonstrates a remarkable aptitude for academic pursuits. 4/Eya Gafsi (21 ans)
-Profession: Ingenieur
-Interests: Painting, Swimming
-Gender: F
-Location: Tunisia, Tunis
-Phone: 55056864
-Biography: Possessing a sharp intellect and an unwavering commitment to excellence, this student consistently shines through their insightful questions and thoughtful engagement 5/Billie Eilish (23 ans)
-Profession: Singer
-Interests: Music, Dancing
-Gender: F
-Location: America, Los Angelos
-Phone: 66222333
-Biography: With a voice that captivates and melodies that resonate, this talented singer possesses a natural gift for musical expression 6/Amira Gafsi (28 ans)
-Profession: Architect
-Interests: Running, Dog walking
-Gender: F
-Location: Paris, France
-Phone: 55066888
-Biography: With a keen eye for detail and a passion for shaping spaces, this aspiring architect blends creativity with a strong understanding of design principles 7/ Profession: University Teacher
-Interests: Art, Music
-Gender: F
-Location: Tunisia, Tunis
-Phone: 53222888
-Biography: A truly inspiring presence in the university, this lovely teacher creates a welcoming and engaging learning environment.
-Si la question ne concerne pas cela, indique poliment que tu es dédié à l’aide aux startups.
-Question utilisateur : ${userQuestion}
-`;
-
-try {
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCYxa1q48AI7KSCqneP02y-x-EpDNx_bIs", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            "contents": [{
-                "parts": [{
-                    "text": fullPrompt
-                }]
-            }]
-        })
-    });
-
-    const data = await response.json();
-    loader.classList.add("d-none");
-
-    if (data && data.candidates && data.candidates.length > 0) {
-        const aiText = data.candidates[0].content.parts[0].text;
-        responseContainer.innerHTML = "<strong class='text-primary'>Assistant IA :</strong><p>" + aiText + "</p>";
-
-        // Redirection si nécessaire
-        if (aiText.includes("formulaire") || aiText.includes("soumettre")) {
-            setTimeout(() => {
-                window.location.href = "ajouter_opportunite.php";
-            }, 5000);
+    
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const profiles = [
+                {
+                    name: "Bassem Hamraoui",
+                    age: 39,
+                    profession: "Actor",
+                    interests: ["Acting", "Music"],
+                    gender: "M",
+                    location: "Tunisia, Tunis",
+                    phone: "50111222",
+                    bio: "An enigmatic presence graced the screen, leaving an indelible mark through nuanced performances and a captivating aura."
+                },
+                {
+                    name: "Zied Mbadra",
+                    age: 20,
+                    profession: "Student",
+                    interests: ["Movies", "Reading"],
+                    gender: "M",
+                    location: "Tunisia, Tunis",
+                    phone: "92330556",
+                    bio: "A bright and enthusiastic student with a passion for learning and a natural curiosity about the world."
+                },
+                {
+                    name: "Mouhamed Khaireddine",
+                    age: 20,
+                    profession: "Engineer",
+                    interests: ["Football", "Video games"],
+                    gender: "M",
+                    location: "Tunisia, Tunis",
+                    phone: "55067187",
+                    bio: "Driven by intellectual curiosity and a thirst for knowledge, this exceptional student consistently demonstrates a remarkable aptitude for academic pursuits."
+                },
+                {
+                    name: "Eya Gafsi",
+                    age: 21,
+                    profession: "Engineer",
+                    interests: ["Painting", "Swimming"],
+                    gender: "F",
+                    location: "Tunisia, Tunis",
+                    phone: "55056864",
+                    bio: "Possessing a sharp intellect and an unwavering commitment to excellence, this student consistently shines through their insightful questions and thoughtful engagement."
+                },
+                {
+                    name: "Billie Eilish",
+                    age: 23,
+                    profession: "Singer",
+                    interests: ["Music", "Dancing"],
+                    gender: "F",
+                    location: "America, Los Angeles",
+                    phone: "66222333",
+                    bio: "With a voice that captivates and melodies that resonate, this talented singer possesses a natural gift for musical expression."
+                },
+                {
+                    name: "Amira Gafsi",
+                    age: 28,
+                    profession: "Architect",
+                    interests: ["Running", "Dog walking"],
+                    gender: "F",
+                    location: "Paris, France",
+                    phone: "55066888",
+                    bio: "With a keen eye for detail and a passion for shaping spaces, this aspiring architect blends creativity with a strong understanding of design principles."
+                },
+                {
+                    name: "Anonymous",
+                    age: null,
+                    profession: "University Teacher",
+                    interests: ["Art", "Music"],
+                    gender: "F",
+                    location: "Tunisia, Tunis",
+                    phone: "53222888",
+                    bio: "A truly inspiring presence in the university, this lovely teacher creates a welcoming and engaging learning environment."
+                }
+            ];
+    
+            document.getElementById('askAIButton').addEventListener('click', function () {
+                const modal = new bootstrap.Modal(document.getElementById('aiModal'));
+                modal.show();
+            });
+    
+            document.getElementById('askButton').addEventListener('click', function () {
+                handleUserQuestion(document.getElementById('questionInput').value);
+            });
+    
+            function handleUserQuestion(userQuestion) {
+                const loader = document.getElementById('loader');
+                const responseContainer = document.getElementById('geminiResponse');
+    
+                if (userQuestion.trim() === "") {
+                    responseContainer.innerHTML = "<span class='text-danger'>Please enter a question.</span>";
+                    return;
+                }
+    
+                loader.classList.remove("d-none");
+                responseContainer.innerHTML = "";
+    
+                setTimeout(() => {
+                    let response = "";
+                    const lowerQuestion = userQuestion.toLowerCase();
+    
+                    if (lowerQuestion.includes("match")) {
+                        const match = profiles.find(profile =>
+                            (profile.profession && lowerQuestion.includes(profile.profession.toLowerCase())) ||
+                            (profile.interests && profile.interests.some(interest => lowerQuestion.includes(interest.toLowerCase())))
+                        );
+    
+                        if (match) {
+                            response = `Sure! Here's a match:<br>
+                                <strong>${match.name}</strong>, a ${match.age ?? 'mystery age'}-year-old ${match.profession}, interested in ${match.interests.join(", ")}, based in ${match.location}.<br>
+                                Bio: ${match.bio}`;
+                        } else {
+                            const fallback = profiles[Math.floor(Math.random() * profiles.length)];
+                            response = `I couldn't find a specific match, but here's someone interesting:<br>
+                                <strong>${fallback.name}</strong>, a ${fallback.age ?? 'mystery age'}-year-old ${fallback.profession}, interested in ${fallback.interests.join(", ")}, based in ${fallback.location}.<br>
+                                Bio: ${fallback.bio}`;
+                        }
+                    } else if (lowerQuestion.includes("hello") || lowerQuestion.includes("hi")) {
+                        response = "Hello! I'm your startup matchmaking assistant. Ask me to find a good entrepreneur for you.";
+                    } else {
+                        response = "Sorry, I only assist with startup matchmaking questions. Please ask me something about finding a match.";
+                    }
+    
+                    responseContainer.innerHTML = response;
+                    speakResponse(stripHTML(response));
+                    loader.classList.add("d-none");
+                }, 1000);
+            }
+    
+            function stripHTML(html) {
+                const div = document.createElement("div");
+                div.innerHTML = html;
+                return div.textContent || div.innerText || "";
+            }
+    
+            function speakResponse(response) {
+        // Cancel any previous speech
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
         }
-
-    } else {
-        responseContainer.innerHTML = "<span class='text-danger'>Pas de réponse. Veuillez réessayer plus tard.</span>";
+    
+        const utterance = new SpeechSynthesisUtterance(response);
+        utterance.lang = 'en-US';
+        utterance.rate = 1; // Speed
+        utterance.pitch = 1; // Voice tone
+        utterance.volume = 1; // Volume
+    
+        // Optional: Wait until voices are loaded
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            utterance.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+        }
+    
+        window.speechSynthesis.speak(utterance);
     }
-} catch (error) {
-    loader.classList.add("d-none");
-    responseContainer.innerHTML = "<span class='text-danger'>Erreur : " + error.message + "</span>";
-}
-});
-</script>
+    
+    
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition;
+    
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+    
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('questionInput').value = transcript;
+                    handleUserQuestion(transcript);
+                };
+    
+                recognition.onerror = (event) => {
+                    alert("Speech recognition error: " + event.error);
+                };
+    
+                document.getElementById('microphone-btn').addEventListener('click', () => {
+                    recognition.start();
+                });
+            } else {
+                document.getElementById('microphone-btn').style.display = 'none';
+                alert("Sorry, your browser does not support speech recognition.");
+            }
+        </script>
+
+    
 
     <!--chatbot End-->
 
