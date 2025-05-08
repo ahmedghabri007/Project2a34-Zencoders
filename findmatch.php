@@ -4,10 +4,9 @@ require __DIR__ . '/vendor/autoload.php'; // Twilio SDK
 
 use Twilio\Rest\Client;
 
-// Twilio configuration (replace with your actual credentials)
-$twilioSid = 'AC6451aa375229df821acd8cf4ea0b9f37';
-$twilioToken = '83f0b7af792c3ecef10f3a28401a6f65';
-$twilioNumber = '+15076657534';
+$twilioSid = 'AC3ddb203bfefc6ce90816714216c86f4d';
+$twilioToken = 'af5a347b131c30f95e8f39017053f410';
+$twilioNumber = '+14174285711';
 
 $pdo = Config::getConnexion();
 
@@ -42,17 +41,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     } elseif (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
         $data = json_decode(file_get_contents("php://input"), true);
-        // Here you would normally insert the match data to a database
         echo json_encode(['status' => 'match_created']);
+        exit;
+    } elseif (!empty($_POST['idprofile']) && !empty($_POST['searcher_name']) && !empty($_POST['description'])) {
+        $stmt = $pdo->prepare("INSERT INTO matches (idprofile, searcher_name, description) VALUES (:idprofile, :searcher_name, :description)");
+        $stmt->execute([
+            ':idprofile' => $_POST['idprofile'],
+            ':searcher_name' => $_POST['searcher_name'],
+            ':description' => $_POST['description']
+        ]);
+        echo "success";
         exit;
     }
 }
 
-// Fetch all profiles
 $stmtProfiles = $pdo->query("SELECT idprofile, fullname FROM profile");
 $profiles = $stmtProfiles->fetchAll();
 
-// Search filter logic
 $profession = $_GET['profession'] ?? '';
 $interests = $_GET['interests'] ?? '';
 $age_min = $_GET['age_min'] ?? 18;
@@ -119,7 +124,58 @@ $matches = $stmt->fetchAll();
         .error-message {
             color: red; font-size: 14px; margin-top: 5px; display: none;
         }
+        #success-message {
+            color: green; font-weight: bold; display: none; margin-top: 10px;
+        }
     </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Add a Match</h2>
+        <form id="add-match-form">
+            <label>Matched Profile :</label>
+            <select name="idprofile">
+                <option value="">-- Sélectionner --</option>
+                <?php foreach ($profiles as $profile): ?>
+                    <option value="<?= $profile['idprofile'] ?>"><?= htmlspecialchars($profile['fullname']) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <div class="error-message" id="error-idprofile"></div>
+
+            <label>Searcher Name :</label>
+            <input type="text" name="searcher_name">
+            <div class="error-message" id="error-searcher_name"></div>
+
+            <label>Description :</label>
+            <textarea name="description"></textarea>
+            <div class="error-message" id="error-description"></div>
+
+            <button type="submit">Add match</button>
+            <div id="success-message"></div>
+        </form>
+    </div>
+
+    <div class="container">
+        <h1>Profiles</h1>
+        <?php foreach ($matches as $profile):
+            $pic = $profile['profile_picture'] ?? '';
+            $picPath = file_exists($_SERVER['DOCUMENT_ROOT'] . "/Elev8Talent/" . $pic) ? "/Elev8Talent/" . $pic : "/Elev8Talent/uploads/default.png";
+        ?>
+            <div class="match-card" data-profile='<?= json_encode($profile, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'>
+                <img src="<?= $picPath ?>" alt="Photo de profil">
+                <h2><?= htmlspecialchars($profile['fullname']) ?> (<?= $profile['age'] ?> ans)</h2>
+                <p><strong>Gender:</strong> <?= htmlspecialchars($profile['gender']) ?></p>
+                <p><strong>Location:</strong> <?= htmlspecialchars($profile['location']) ?></p>
+                <p><strong>Profession:</strong> <?= htmlspecialchars($profile['profession']) ?></p>
+                <p><strong>Biography:</strong> <?= htmlspecialchars($profile['biography']) ?></p>
+                <p><strong>Interests:</strong> <?= htmlspecialchars($profile['interests']) ?></p>
+                <p><strong>Phone Number:</strong> <?= htmlspecialchars($profile['phone']) ?></p>
+                <button class="match-btn" onclick="matchProfile(<?= $profile['idprofile'] ?>)">Send an SMS</button>
+                <button class="match-btn" onclick="matchProfileAdvanced(this)">Create a match</button>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
     <script>
         function matchProfile(id) {
             fetch('findmatch.php', {
@@ -169,46 +225,62 @@ $matches = $stmt->fetchAll();
                 console.error(err);
             });
         }
-    </script>
-</head>
-<body>
-    <div class="form-container">
-        <h2>Add a Match</h2>
-        <form id="add-match-form">
-            <label>Matched Profile :</label>
-            <select name="idprofile">
-                <option value="">-- Sélectionner --</option>
-                <?php foreach ($profiles as $profile): ?>
-                    <option value="<?= $profile['idprofile'] ?>"><?= htmlspecialchars($profile['fullname']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <label>Searcher Name :</label>
-            <input type="text" name="searcher_name">
-            <label>Description :</label>
-            <textarea name="description"></textarea>
-            <button type="submit">Add match</button>
-        </form>
-    </div>
 
-    <div class="container">
-        <h1>Profiles</h1>
-        <?php foreach ($matches as $profile):
-            $pic = $profile['profile_picture'] ?? '';
-            $picPath = file_exists($_SERVER['DOCUMENT_ROOT'] . "/Elev8Talent/" . $pic) ? "/Elev8Talent/" . $pic : "/Elev8Talent/uploads/default.png";
-        ?>
-            <div class="match-card" data-profile='<?= json_encode($profile, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>'>
-                <img src="<?= $picPath ?>" alt="Photo de profil">
-                <h2><?= htmlspecialchars($profile['fullname']) ?> (<?= $profile['age'] ?> ans)</h2>
-                <p><strong>Gender:</strong> <?= htmlspecialchars($profile['gender']) ?></p>
-                <p><strong>Location:</strong> <?= htmlspecialchars($profile['location']) ?></p>
-                <p><strong>Profession:</strong> <?= htmlspecialchars($profile['profession']) ?></p>
-                <p><strong>Biography:</strong> <?= htmlspecialchars($profile['biography']) ?></p>
-                <p><strong>Interests:</strong> <?= htmlspecialchars($profile['interests']) ?></p>
-                <p><strong>Phone Number:</strong> <?= htmlspecialchars($profile['phone']) ?></p>
-                <button class="match-btn" onclick="matchProfile(<?= $profile['idprofile'] ?>)">Send an SMS</button>
-                <button class="match-btn" onclick="matchProfileAdvanced(this)">Create a match</button>
-            </div>
-        <?php endforeach; ?>
-    </div>
+        document.getElementById('add-match-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const form = event.target;
+
+            const idprofile = form.querySelector('[name="idprofile"]').value.trim();
+            const searcher_name = form.querySelector('[name="searcher_name"]').value.trim();
+            const description = form.querySelector('[name="description"]').value.trim();
+
+            document.getElementById("error-idprofile").style.display = "none";
+            document.getElementById("error-searcher_name").style.display = "none";
+            document.getElementById("error-description").style.display = "none";
+            document.getElementById("success-message").style.display = "none";
+
+            let hasError = false;
+            if (!idprofile) {
+                document.getElementById("error-idprofile").textContent = "❌ Veuillez sélectionner un profil.";
+                document.getElementById("error-idprofile").style.display = "block";
+                hasError = true;
+            }
+            if (!searcher_name) {
+                document.getElementById("error-searcher_name").textContent = "❌ Le nom du chercheur est requis.";
+                document.getElementById("error-searcher_name").style.display = "block";
+                hasError = true;
+            }
+            if (!description) {
+                document.getElementById("error-description").textContent = "❌ La description est requise.";
+                document.getElementById("error-description").style.display = "block";
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const formData = new FormData(form);
+            fetch('findmatch.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur serveur');
+                return response.text();
+            })
+            .then(data => {
+                if (data.trim() === "success") {
+                    document.getElementById("success-message").textContent = "✅ Match ajouté avec succès !";
+                    document.getElementById("success-message").style.display = "block";
+                    form.reset();
+                } else {
+                    throw new Error("Réponse inattendue");
+                }
+            })
+            .catch(error => {
+                console.error("Erreur : ", error);
+                alert("❌ Une erreur est survenue lors de l'ajout.");
+            });
+        });
+    </script>
 </body>
 </html>
