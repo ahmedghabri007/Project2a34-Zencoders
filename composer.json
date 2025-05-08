@@ -1,0 +1,7 @@
+{
+    "require": {
+        "endroid/qr-code": "^5.1",
+        "tecnickcom/tcpdf": "^6.9",
+        "phpmailer/phpmailer": "^6.10"
+    }
+}
