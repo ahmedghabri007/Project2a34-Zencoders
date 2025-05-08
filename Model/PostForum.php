@@ -10,8 +10,10 @@ class PostForum {
 
     public function getPostsByThread($threadId) {
         try {
-            $stmt = $this->pdo->prepare('SELECT p.*, f.sujet as thread_title FROM post_forum p 
+            $stmt = $this->pdo->prepare('SELECT p.*, f.sujet as thread_title, u.username, u.role, u.linkedin_url, u.instagram_url, u.facebook_url 
+                                       FROM post_forum p 
                                        LEFT JOIN forum f ON p.thread = f.id_forum 
+                                       LEFT JOIN users u ON p.user_id = u.id 
                                        WHERE p.thread = ? ORDER BY p.id_post DESC');
             $stmt->execute([$threadId]);
             return $stmt->fetchAll();
@@ -21,15 +23,15 @@ class PostForum {
         }
     }
 
-    public function addPost($comment, $threadId) {
+    public function addPost($comment, $threadId, $user_id = null) {
         try {
             if (empty($comment) || strlen($comment) < 2 || strlen($comment) > 1000) {
                 throw new Exception('Comment must be between 2 and 1000 characters');
             }
 
-            $stmt = $this->pdo->prepare('INSERT INTO post_forum (comment, thread, upvote, downvote, status, date_publication) 
-                                       VALUES (?, ?, 0, 0, "active", NOW())');
-            $result = $stmt->execute([trim($comment), $threadId]);
+            $stmt = $this->pdo->prepare('INSERT INTO post_forum (comment, thread, user_id, upvote, downvote, status, date_publication) 
+                                       VALUES (?, ?, ?, 0, 0, "active", NOW())');
+            $result = $stmt->execute([trim($comment), $threadId, $user_id]);
             
             if (!$result) {
                 throw new Exception('Failed to add comment: ' . implode(', ', $stmt->errorInfo()));
@@ -99,9 +101,30 @@ class PostForum {
         }
     }
 
+    public function getTopCommentsToday() {
+        try {
+            $query = 'SELECT p.*, f.sujet as thread_title, u.username, u.role, u.linkedin_url, u.instagram_url, u.facebook_url 
+                     FROM post_forum p 
+                     LEFT JOIN forum f ON p.thread = f.id_forum 
+                     LEFT JOIN users u ON p.user_id = u.id 
+                     WHERE DATE(p.date_publication) = CURDATE() 
+                     ORDER BY (p.upvote - p.downvote) DESC 
+                     LIMIT 10';
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log('Error in getTopCommentsToday: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function getPostById($id) {
         try {
-            $stmt = $this->pdo->prepare('SELECT * FROM post_forum WHERE id_post = ?');
+            $stmt = $this->pdo->prepare('SELECT p.*, u.username, u.role, u.linkedin_url, u.instagram_url, u.facebook_url 
+                                       FROM post_forum p 
+                                       LEFT JOIN users u ON p.user_id = u.id 
+                                       WHERE p.id_post = ?');
             $stmt->execute([$id]);
             return $stmt->fetch();
         } catch (Exception $e) {

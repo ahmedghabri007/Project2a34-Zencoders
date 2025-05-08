@@ -43,6 +43,54 @@
                 <i class="bi bi-plus-circle me-2"></i>Create New Thread
             </a>
         </div>
+        
+        <!-- Search and Filter Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="/project-2a34/index.php" method="GET" class="row g-3">
+                    <input type="hidden" name="action" value="list">
+                    
+                    <!-- Search Input -->
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search by title or content" name="search" value="<?= htmlspecialchars($filterParams['search'] ?? '') ?>">
+                        </div>
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="col-md-2">
+                        <select class="form-select" name="status">
+                            <option value="" <?= ($filterParams['status'] ?? '') === '' ? 'selected' : '' ?>>All Status</option>
+                            <option value="active" <?= ($filterParams['status'] ?? '') === 'active' ? 'selected' : '' ?>>Active</option>
+                            <option value="inactive" <?= ($filterParams['status'] ?? '') === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sort By -->
+                    <div class="col-md-2">
+                        <select class="form-select" name="sort">
+                            <option value="date_publication" <?= ($filterParams['sort'] ?? '') === 'date_publication' ? 'selected' : '' ?>>Date</option>
+                            <option value="comment_count" <?= ($filterParams['sort'] ?? '') === 'comment_count' ? 'selected' : '' ?>>Most Commented</option>
+                            <option value="upvote_count" <?= ($filterParams['sort'] ?? '') === 'upvote_count' ? 'selected' : '' ?>>Most Upvoted</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sort Order -->
+                    <div class="col-md-1">
+                        <select class="form-select" name="order">
+                            <option value="DESC" <?= ($filterParams['order'] ?? '') === 'DESC' ? 'selected' : '' ?>>Desc</option>
+                            <option value="ASC" <?= ($filterParams['order'] ?? '') === 'ASC' ? 'selected' : '' ?>>Asc</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <?php if (empty($forums)): ?>
             <div class="alert alert-info">
@@ -56,6 +104,8 @@
                             <div class="p-4">
                                 <div class="d-flex mb-3">
                                     <small class="me-3"><i class="far fa-calendar-alt text-primary me-2"></i><?= date('F j, Y', strtotime($forum['date_publication'])) ?></small>
+                                    <small class="me-3"><i class="far fa-comments text-primary me-2"></i><?= (int)$forum['comment_count'] ?> Comments</small>
+                                    <small class="me-3"><i class="far fa-thumbs-up text-primary me-2"></i><?= (int)$forum['upvote_count'] ?> Upvotes</small>
                                 </div>
                                 <h4 class="mb-3">
                                     <a href="/project-2a34/index.php?action=view&id=<?= htmlspecialchars($forum['id_forum']) ?>" class="text-dark">

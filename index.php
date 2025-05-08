@@ -5,12 +5,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/Controller/BackOfficeController.php';
 require_once __DIR__ . '/Controller/AuthController.php';
+require_once __DIR__ . '/Controller/UserController.php';
 
 $backOfficeController = new BackOfficeController();
 $authController = new AuthController();
+$userController = new UserController();
 
 // Check if it's a forum-related action
-if (isset($_GET['action']) && in_array($_GET['action'], ['list', 'createThread', 'edit', 'delete', 'view', 'vote', 'addComment', 'editComment', 'deleteComment'])) {
+if (isset($_GET['action']) && in_array($_GET['action'], ['list', 'createThread', 'edit', 'delete', 'view', 'vote', 'addComment', 'editComment', 'deleteComment', 'analytics', 'translate'])) {
     // Include and run the ForumController
     include_once __DIR__ . '/Controller/ForumController.php';
     exit; // ForumController handles the response
@@ -129,6 +131,48 @@ if (isset($_GET['action'])) {
             }
             break;
 
+        // User Management Actions
+        case 'users':
+            if ($authController->isAdmin()) {
+                $userController->listUsers();
+            } else {
+                header('Location: view/login.php');
+            }
+            exit;
+            
+        case 'addUser':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $authController->isAdmin()) {
+                $userController->addUser();
+            } else {
+                header('Location: view/login.php');
+            }
+            exit;
+            
+        case 'editUser':
+            if ($authController->isAdmin()) {
+                $id = $_GET['id'] ?? null;
+                $userController->editUser($id);
+            } else {
+                header('Location: view/login.php');
+            }
+            exit;
+            
+        case 'updateUser':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && $authController->isAdmin()) {
+                $userController->updateUser();
+            } else {
+                header('Location: view/login.php');
+            }
+            exit;
+            
+        case 'deleteUser':
+            if ($authController->isAdmin()) {
+                $userController->deleteUser();
+            } else {
+                header('Location: view/login.php');
+            }
+            exit;
+            
         default:
             header('Location: view/login.php');
             exit;

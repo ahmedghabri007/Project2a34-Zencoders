@@ -1,27 +1,86 @@
 <?php
 require_once __DIR__ . '/../model/Forum.php';
 require_once __DIR__ . '/../model/PostForum.php';
+require_once __DIR__ . '/../model/User.php';
+require_once __DIR__ . '/../services/TranslationService.php';
 
 $forumModel = new Forum();
 $postModel = new PostForum();
+$userModel = new User();
+$translationService = new TranslationService();
 
 $action = $_GET['action'] ?? 'list';
 
 switch ($action) {
+    case 'translate':
+        // Handle translation request
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+            exit();
+        }
+        
+        $text = $_POST['text'] ?? '';
+        $language = $_POST['language'] ?? 'fr';
+        
+        if (empty($text)) {
+            echo json_encode(['success' => false, 'error' => 'No text provided']);
+            exit();
+        }
+        
+        // Set the target language
+        $translationService->setTargetLanguage($language);
+        
+        // Translate the text
+        $translation = $translationService->translate($text);
+        
+        echo json_encode([
+            'success' => true,
+            'translation' => $translation,
+            'language' => $language
+        ]);
+        exit();
+        break;
     case 'list':
     default:
-        $forums = $forumModel->getAllForums();
+        // Get search, filter, and sorting parameters
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'date_publication';
+        $sortOrder = isset($_GET['order']) ? $_GET['order'] : 'DESC';
+        $status = isset($_GET['status']) ? $_GET['status'] : null;
+        
+        // Get forums with applied filters and sorting
+        $forums = $forumModel->getAllForums($search, $sortBy, $sortOrder, $status);
         if ($forums === false) {
             $forums = [];
             $_SESSION['error'] = 'Error loading forums';
         }
+        
+        // Pass the filter parameters to the view for maintaining state
+        $filterParams = [
+            'search' => $search,
+            'sort' => $sortBy,
+            'order' => $sortOrder,
+            'status' => $status
+        ];
+        
         include __DIR__ . '/../view/Forum/list.php';
         break;
 
+    case 'analytics':
+        // Get top hits and top comments for today
+        $topHits = $forumModel->getTopHitsToday();
+        $topComments = $postModel->getTopCommentsToday();
+        
+        include __DIR__ . '/../view/Forum/analytics.php';
+        break;
+        
     case 'createThread':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sujet = trim($_POST['title'] ?? '');
             $contenu = trim($_POST['content'] ?? '');
+            $user_id = !empty($_POST['user_id']) ? $_POST['user_id'] : null;
             $error = '';
 
             // Validate subject
@@ -47,7 +106,7 @@ switch ($action) {
             if ($error) {
                 include __DIR__ . '/../view/Forum/create_thread.php';
             } else {
-                $result = $forumModel->addForum($sujet, $contenu);
+                $result = $forumModel->addForum($sujet, $contenu, $user_id);
                 if ($result) {
                     $_SESSION['success'] = 'Thread created successfully!';
                     header('Location: /project-2a34/index.php?action=list');
@@ -144,18 +203,25 @@ switch ($action) {
     case 'view':
         if (!isset($_GET['id'])) {
             $_SESSION['error'] = 'Forum ID is required';
-            header('Location: /project-2a34/index.php');
+            header('Location: /project-2a34/index.php?action=list');
             exit();
         }
-
+        
         $id = $_GET['id'];
+        
+        // Increment view counter
+        $forumModel->incrementViews($id);
+        
         $forum = $forumModel->getForumById($id);
-
-        if ($forum === false) {
+        
+        if (!$forum) {
             $_SESSION['error'] = 'Forum not found';
-            header('Location: /project-2a34/index.php');
+            header('Location: /project-2a34/index.php?action=list');
             exit();
         }
+        
+        // Get users for the comment form dropdown
+        $users = $userModel->getAllUsers();
 
         // Get comments for this forum
         $posts = $postModel->getPostsByThread($id);
@@ -175,6 +241,9 @@ switch ($action) {
         
         $commentId = $_GET['id'];
         $threadId = $_GET['thread'];
+        
+        // Get users for the edit form
+        $users = $userModel->getAllUsers();
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $commentText = trim($_POST['comment'] ?? '');
@@ -271,6 +340,7 @@ switch ($action) {
         }
 
         $comment = trim($_POST['comment'] ?? '');
+        $user_id = !empty($_POST['user_id']) ? $_POST['user_id'] : null;
         $error = '';
 
         // Validate comment
@@ -288,7 +358,7 @@ switch ($action) {
             include __DIR__ . '/../view/Forum/view.php';
             include __DIR__ . '/../view/Forum/comments.php';
         } else {
-            $result = $postModel->addPost($comment, $threadId);
+            $result = $postModel->addPost($comment, $threadId, $user_id);
             if ($result) {
                 header('Location: /project-2a34/index.php?action=view&id=' . $threadId);
                 exit();

@@ -240,6 +240,12 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
                             <span class="pc-mtext">Comments</span>
                         </a>
                     </li>
+                    <li class="pc-item">
+                        <a href="/project-2a34/index.php?action=users" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-users"></i></span>
+                            <span class="pc-mtext">Users</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
