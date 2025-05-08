@@ -51,7 +51,7 @@ if ($status) {
         </a>
         <hr class="sidebar-divider my-0">
         <li class="nav-item">
-            <a class="nav-link" href="dashboard_verification.php">
+            <a class="nav-link" href="list_verification.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Verification</span></a>
             </li>
@@ -67,10 +67,20 @@ if ($status) {
                     <span>Statistics Verification</span>
                 </a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
             <a class="nav-link" href="list_badge_upgrade.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Upgrade</span></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="dashboard_tri.php">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Sort</span></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="list_trustbadge.php">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>TrustBadge</span></a>
             </li>
             </ul>
 <div class="container mt-5">

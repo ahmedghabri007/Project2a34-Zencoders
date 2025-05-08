@@ -3,41 +3,45 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 include '../../config/config.php';
 
-// Delete verification
+// Delete trustbadge
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
     $pdo = Config::getConnexion();
-    $stmt = $pdo->prepare("DELETE FROM verification WHERE id = ?");
+    $stmt = $pdo->prepare("DELETE FROM trustbadge WHERE id = ?");
     $stmt->execute([$id]);
-    header("Location: list_verification.php");
+    header("Location: list_trustbadge.php");
     exit();
 }
 
-// Update verification
+// Update trustbadge
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $pdo = Config::getConnexion();
-    $stmt = $pdo->prepare("UPDATE verification SET document_type = ?, document_number = ?, status = ? WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE trustbadge SET type_badge = ?, niveau_confiance = ?, status = ?, rejected_reason = ?, notes = ?, user_report = ?, report_status = ? WHERE id = ?");
     $stmt->execute([
-        $_POST['document_type'],
-        $_POST['document_number'],
+        $_POST['type_badge'],
+        $_POST['niveau_confiance'],
         $_POST['status'],
+        $_POST['rejected_reason'],
+        $_POST['notes'],
+        $_POST['user_report'],
+        $_POST['report_status'],
         $_POST['id']
     ]);
-    header("Location: list_verification.php");
+    header("Location: list_trustbadge.php");
     exit();
 }
 
-// Fetch all
+// Fetch trustbadges
 $pdo = Config::getConnexion();
-$verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+$badges = $pdo->query("SELECT * FROM trustbadge ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!-- HTML STARTS HERE -->
+<!-- HTML Starts -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Dashboard - Verification</title>
+    <meta charset="UTF-8">
+    <title>Dashboard - Trustbadge</title>
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="sb-admin-2.min.css" rel="stylesheet">
     <style>
@@ -55,14 +59,15 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
             <div class="sidebar-brand-text mx-3">Elev8Talent</div>
         </a>
         <hr class="sidebar-divider my-0">
-        <li class="nav-item active">
-            <a class="nav-link" href="list_verification.php">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Verification</span></a>
-        </li>
         <li class="nav-item">
-            <a class="nav-link" href="dashboard_search.php">
+            <a class="nav-link" href="list_verification.php">
                 <i class="fas fa-fw fa-id-card"></i>
+                <span>Verification</span>
+            </a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="dashboard_search.php">
+                <i class="fas fa-fw fa-search"></i>
                 <span>Search Verification</span>
             </a>
         </li>
@@ -81,26 +86,18 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
             <a class="nav-link" href="dashboard_tri.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Sort</span></a>
-        </li>
-        <li class="nav-item">
+            </li>
+            <li class="nav-item">
             <a class="nav-link" href="list_trustbadge.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>TrustBadge</span></a>
         </li>
     </ul>
 
-    <!-- Content -->
     <div id="content-wrapper" class="d-flex flex-column">
         <div id="content">
-
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                    <i class="fa fa-bars"></i>
-                </button>
-            </nav>
-
             <div class="container-fluid">
-                <h1 class="h3 mb-4 text-gray-800">Manage Verifications</h1>
+                <h1 class="h3 mb-4 text-gray-800">Manage Trust Badges</h1>
 
                 <div class="card shadow mb-4">
                     <div class="card-body">
@@ -109,36 +106,37 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
                                 <thead class="thead-light">
                                     <tr>
                                         <th>ID</th>
-                                        <th>Document Type</th>
-                                        <th>Document Number</th>
+                                        <th>Verification ID</th>
+                                        <th>Type</th>
+                                        <th>Niveau</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($verifications as $doc): ?>
+                                    <?php foreach ($badges as $badge): ?>
                                         <tr>
-                                            <form method="POST" action="list_verification.php">
-                                                <input type="hidden" name="id" value="<?= $doc['id'] ?>">
-                                                <td><?= $doc['id'] ?></td>
+                                            <form method="POST" action="list_trustbadge.php">
+                                                <input type="hidden" name="id" value="<?= $badge['id'] ?>">
+                                                <td><?= $badge['id'] ?></td>
+                                                <td><?= $badge['verification_id'] ?></td>
                                                 <td>
-                                                    <select name="document_type" class="form-control">
-                                                        <option value="CNI" <?= $doc['document_type'] == 'CNI' ? 'selected' : '' ?>>CNI</option>
-                                                        <option value="PASSEPORT" <?= $doc['document_type'] == 'PASSEPORT' ? 'selected' : '' ?>>Passeport</option>
-                                                        <option value="PERMIS" <?= $doc['document_type'] == 'PERMIS' ? 'selected' : '' ?>>Permis</option>
+                                                    <select name="type_badge" class="form-control">
+                                                        <option value="bronze" <?= $badge['type_badge'] == 'bronze' ? 'selected' : '' ?>>Bronze</option>
+                                                        <option value="silver" <?= $badge['type_badge'] == 'silver' ? 'selected' : '' ?>>Silver</option>
+                                                        <option value="gold" <?= $badge['type_badge'] == 'gold' ? 'selected' : '' ?>>Gold</option>
                                                     </select>
                                                 </td>
-                                                <td><input type="text" name="document_number" class="form-control" value="<?= htmlspecialchars($doc['document_number']) ?>"></td>
+                                                <td><input type="number" name="niveau_confiance" class="form-control" value="<?= $badge['niveau_confiance'] ?>"></td>
                                                 <td>
                                                     <select name="status" class="form-control">
-                                                        <option value="PENDING" <?= $doc['status'] == 'PENDING' ? 'selected' : '' ?>>PENDING</option>
-                                                        <option value="APPROVED" <?= $doc['status'] == 'APPROVED' ? 'selected' : '' ?>>APPROVED</option>
-                                                        <option value="REJECTED" <?= $doc['status'] == 'REJECTED' ? 'selected' : '' ?>>REJECTED</option>
+                                                        <option value="approved" <?= $badge['status'] == 'approved' ? 'selected' : '' ?>>Approved</option>
+                                                        <option value="rejected" <?= $badge['status'] == 'rejected' ? 'selected' : '' ?>>Rejected</option>
                                                     </select>
                                                 </td>
                                                 <td>
                                                     <button type="submit" name="update" class="btn btn-primary">Update</button>
-                                                    <a href="?delete=<?= $doc['id'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                                                    <a href="?delete=<?= $badge['id'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                                                 </td>
                                             </form>
                                         </tr>
@@ -146,8 +144,8 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
                                 </tbody>
                             </table>
 
-                            <?php if (empty($verifications)): ?>
-                                <div class="text-center text-muted">No verifications found.</div>
+                            <?php if (empty($badges)): ?>
+                                <div class="text-center text-muted">No trust badges found.</div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -159,11 +157,10 @@ $verifications = $pdo->query("SELECT * FROM verification ORDER BY id DESC")->fet
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="text-center my-auto">
-                    <span>Copyright &copy; elev8talent</span>
+                    <span>&copy; elev8talent</span>
                 </div>
             </div>
         </footer>
-
     </div>
 </div>
 

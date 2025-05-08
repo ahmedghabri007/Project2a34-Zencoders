@@ -84,10 +84,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span>Statistics Verification</span>
             </a>
         </li>
-        <li class="nav-item active">
+        <li class="nav-item ">
             <a class="nav-link" href="list_badge_upgrade.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Upgrade</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="dashboard_tri.php">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>Sort</span></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" href="list_trustbadge.php">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>TrustBadge</span></a>
         </li>
     </ul>
 
